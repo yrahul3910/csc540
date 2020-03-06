@@ -19,7 +19,7 @@ Edits (pid, sid)
 WritesArticle (aid, sid)
 WritesPublication (pid, sid)
 HasTopic (pid, topic)
-++ HasChapter(bid, cid)   // for chapters written but later removed
+++ HasChapter(pid, cid)   // for chapters written but later removed
 
 */
 
@@ -259,7 +259,8 @@ NATURAL JOIN MakesOrder
 NATURAL JOIN Orders
 GROUP BY did, MONTH(odate);
 
-SELECT did, SUM(copies) * price + shcost * COUNT(*) AS TotalPrice, dname, address, city
+/* Change shcost * COUNT(*) */
+SELECT did, MONTH(odate), SUM(copies) * price + shcost * COUNT(*) AS TotalPrice, dname, address, city
 FROM Distributors
 NATURAL JOIN MakesOrder
 NATURAL JOIN Orders
@@ -314,8 +315,10 @@ WITH Profits AS (
     FROM Orders
     NATURAL JOIN ConsistOf
     NATURAL JOIN Publications
+    NATURAL JOIN MakesOrder
+    NATURAL JOIN Distributors
 )
-SELECT SUM(*) As Revenue
+SELECT city, SUM(Profit) As Revenue
 FROM Profits
 GROUP BY city;
 
@@ -325,8 +328,10 @@ WITH Profits AS (
     FROM Orders
     NATURAL JOIN ConsistOf
     NATURAL JOIN Publications
+    NATURAL JOIN MakesOrder
+    NATURAL JOIN Distributors
 )
-SELECT SUM(*) As Revenue, dname
+SELECT did, SUM(*) As Revenue, dname
 FROM Profits
 GROUP BY did;
 
@@ -336,8 +341,10 @@ WITH Profits AS (
     FROM Orders
     NATURAL JOIN ConsistOf
     NATURAL JOIN Publications
+    NATURAL JOIN MakesOrder
+    NATURAL JOIN Distributors
 )
-SELECT SUM(*) As Revenue, dname
+SELECT address, SUM(*) As Revenue, dname
 FROM Profits
 GROUP BY address;
 
@@ -352,7 +359,7 @@ PeriodicSalaries AS (
     FROM Staff
     WHERE periodicity <> -1
 )
-SELECT SUM(pay)
+SELECT stype, SUM(pay)
 FROM (
     SELECT *
     FROM ConstantSalaries
