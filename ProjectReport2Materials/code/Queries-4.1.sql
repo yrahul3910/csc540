@@ -99,7 +99,7 @@ VALUES (...);
 DELETE FROM HasChapter
 WHERE ...;
 
--- Production of a book edition or of an issue of a publication
+-- NARRATIVE PART 2: Production of a book edition or of an issue of a publication
 ---------------------------------------------------------------
 -- Enter a new book edition or new issue of a publication
 INSERT INTO Books
@@ -197,7 +197,7 @@ WHERE name = ...;
 /* This isn't how our payment system works. We assume a direct deposit system where funds are automatically
 disbursed according to a pay schedule. */
 
--- Distribution
+-- NARRATIVE PART 3: Distribution
 -----------------------------------------------
 -- Enter new distributor
 INSERT INTO Distributors
@@ -251,6 +251,9 @@ AND did = (
 -- Bill distributor for an order
 -- change outstanding balance of a distributor on receipt of a payment
 /* Done above */
+
+-- NARRATIVE PART 4: Reports
+--------------------------------------
 
 -- number and total price of copies of each publication bought per distributor per month;
 SELECT did, MONTH(odate), dname, address, city, COUNT(*) AS Count
