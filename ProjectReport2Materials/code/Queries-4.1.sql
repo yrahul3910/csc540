@@ -259,8 +259,7 @@ NATURAL JOIN MakesOrder
 NATURAL JOIN Orders
 GROUP BY did, MONTH(odate);
 
-/* Change shcost * COUNT(*) */
-SELECT did, MONTH(odate), SUM(copies) * price + shcost * COUNT(*) AS TotalPrice, dname, address, city
+SELECT did, MONTH(odate), SUM(copies) * price + SUM(shcost) AS TotalPrice, dname, address, city
 FROM Distributors
 NATURAL JOIN MakesOrder
 NATURAL JOIN Orders
