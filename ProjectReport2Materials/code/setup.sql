@@ -26,6 +26,7 @@ DROP TABLE IF EXISTS HasTopic CASCADE;
 
 -- Create tables --
 
+/*phone number can be set as null, in case the employee does not have a phone number*/
 CREATE TABLE Staff (
 sid INT NOT NULL AUTO_INCREMENT,
 sname VARCHAR(50) NOT NULL,
@@ -65,6 +66,7 @@ VALUES ('Ryan Kipling', 'author', '2012-03-10', 14, '1977-01-11', 'male', '342-5
 
 
 
+/* punlication price can be NULL , for instance , the manager has not decided a price for an incoming publication */
 CREATE TABLE Publications (
 pid INT AUTO_INCREMENT PRIMARY KEY,
 title VARCHAR(250) NOT NULL,
@@ -128,6 +130,7 @@ shcost FLOAT NOT NULL,
 odate DATE NOT NULL
 );
 
+/*phone number can be set as null, in case distributor does not has a phone number. anyways distributor address is more used in real life scenario than phone numer*/
 CREATE TABLE Distributors(
 did INT AUTO_INCREMENT PRIMARY KEY,
 dname VARCHAR(100) NOT NULL,
