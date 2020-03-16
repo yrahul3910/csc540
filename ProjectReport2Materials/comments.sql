@@ -25,10 +25,6 @@ where p.pid = t.pid;
 4.2 
 
 -- show all employees whose salary is less than 300$ --
-Explain Select sid, sname 
-from staff
-where pay < 300 ;
-Alter table staff add index (pay)
 
 EXPLAIN SELECT sid, sname
     -> FROM staff
