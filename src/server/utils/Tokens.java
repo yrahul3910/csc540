@@ -11,9 +11,23 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Date;
 
+/**
+ * Class Tokens.
+ *
+ * Implements generation and validation of JSON Web Tokens. For
+ * the JWT specification, see jwt.io.
+ */
 public class Tokens {
+    /**
+     * Creates a JWT with a single username claim, and an expiry of 1 day.
+     * Prints error message and returns null if error occurs in creation of
+     * token.
+     * @param username - String, The username to encode
+     * @return token - String?, The JWT, or null if failed to create token
+     */
     public static String createJWT(String username) {
         try {
+            // TODO: Better secret, ideally use some cyclic shift/rotation
             Algorithm algorithm = Algorithm.HMAC256("shhh");
 
             return JWT.create()
@@ -31,6 +45,12 @@ public class Tokens {
         }
     }
 
+    /**
+     * Decodes a JWT and returns the username encoded inside. If the
+     * token is not valid or could not be decoded, returns null.
+     * @param jwt - String, a valid JWT
+     * @return username - String?, a nullable username decoded from the token
+     */
     public static String decodeJWT(String jwt) {
         try {
             Algorithm algorithm = Algorithm.HMAC256("shhh");

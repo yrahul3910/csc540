@@ -3,6 +3,26 @@ CREATE DATABASE setup;
 USE setup;
 
 
+/**
+DROP TABLE IF EXISTS Staff CASCADE;
+DROP TABLE IF EXISTS Publications CASCADE;
+DROP TABLE IF EXISTS Books CASCADE;
+DROP TABLE IF EXISTS Chapters CASCADE;
+DROP TABLE IF EXISTS PeriodicPublication CASCADE;
+DROP TABLE IF EXISTS Issue CASCADE;
+DROP TABLE IF EXISTS Articles CASCADE;
+DROP TABLE IF EXISTS Topics CASCADE;
+DROP TABLE IF EXISTS Orders CASCADE;
+DROP TABLE IF EXISTS Distributors CASCADE;
+
+DROP TABLE IF EXISTS Edit CASCADE;
+DROP TABLE IF EXISTS WriteArticle CASCADE;
+DROP TABLE IF EXISTS WriteBook CASCADE;
+DROP TABLE IF EXISTS ContainArticle CASCADE;
+DROP TABLE IF EXISTS ConsistOf CASCADE;
+DROP TABLE IF EXISTS HasTopic CASCADE;
+
+**/
 
 -- Create tables --
 
@@ -55,35 +75,37 @@ price FLOAT
 );
 
 CREATE TABLE Books(
-pid INT PRIMARY KEY,
+pid INT NOT NULL,
 ISBN VARCHAR(50) NOT NULL,
 edition INT,
 FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE
+ON DELETE CASCADE
 );
 
 CREATE TABLE Chapters(
-pid INT,
-chno INT,
+pid INT NOT NULL,
+chno INT NOT NULL,
 chtitle VARCHAR(150) NOT NULL,
 url VARCHAR(2048) NOT NULL,
+modifyDate DATE NOT NULL,
 PRIMARY KEY(pid, chno),
 FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE
 );
 
 CREATE TABLE PeriodicPublication (
-pid INT PRIMARY KEY,
+pid INT NOT NULL,
 periodicity INT NOT NULL,
 pptype VARCHAR(30) NOT NULL,
 FOREIGN KEY(pid) REFERENCES Publications(pid)
 ON UPDATE CASCADE
-
 );
 
 CREATE TABLE Issue(
-pid INT,
-ino INT,
+pid INT NOT NULL,
+ino INT NOT NULL,
 PRIMARY KEY(pid, ino),
 FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE
+ON DELETE CASCADE
 );
 
 CREATE TABLE Articles(
@@ -117,45 +139,45 @@ tot_balance FLOAT
 );
 
 CREATE TABLE ConsistOf(
-oid INT,
-pid INT,
+oid INT NOT NULL,
+pid INT NOT NULL,
 FOREIGN KEY(oid) REFERENCES Orders(oid) ON UPDATE CASCADE,
 FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE
 );
 
 CREATE TABLE MakeOrder(
-did INT,
-oid INT,
+did INT NOT NULL,
+oid INT NOT NULL,
 FOREIGN KEY(did) REFERENCES Distributors(did) ON UPDATE CASCADE,
 FOREIGN KEY(oid) REFERENCES Orders(oid) ON UPDATE CASCADE
 );
 
 CREATE TABLE ContainArticle(
-pid INT,
-aid INT,
+pid INT NOT NULL,
+aid INT NOT NULL,
 FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE,
 FOREIGN KEY(aid) REFERENCES Articles(aid) ON UPDATE CASCADE
 );
 
 CREATE TABLE Edit(
-pid INT,
-sid INT,
-sdate DATE,
+pid INT NOT NULL,
+sid INT NOT NULL,
+sdate DATE NOT NULL,
 FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE,
 FOREIGN KEY(sid, sdate) REFERENCES Staff(sid, sdate)
 ON UPDATE CASCADE
 );
 
 CREATE TABLE HasTopic(
-pid INT,
+pid INT NOT NULL,
 topic VARCHAR(50),
 FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE,
 FOREIGN KEY(topic) REFERENCES Topics(topic) ON UPDATE CASCADE
 );
 
 CREATE TABLE WriteArticle(
-aid INT,
-sid INT,
+aid INT NOT NULL,
+sid INT NOT NULL,
 sdate DATE,
 FOREIGN KEY(aid) REFERENCES Articles(aid) ON UPDATE CASCADE,
 FOREIGN KEY(sid, sdate) REFERENCES Staff(sid, sdate)
@@ -163,9 +185,9 @@ ON UPDATE CASCADE
 );
 
 CREATE TABLE WriteBook(
-pid INT,
-sid INT,
-sdate DATE,
+pid INT NOT NULL,
+sid INT NOT NULL,
+sdate DATE NOT NULL,
 FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE,
 FOREIGN KEY(sid, sdate) REFERENCES Staff(sid, sdate)
 ON UPDATE CASCADE
@@ -174,29 +196,33 @@ ON UPDATE CASCADE
 
 -- Publications --
 INSERT INTO Publications(title, ptype, dop, url, price) 
-VALUES ('Knowledge Engineering and Semantic Web', 'book', '2017-11-08','https://www.springer.com/gp/book/9783319695471', 37.12);
+VALUES ('Knowledge Engineering', 'book', '2017-11-08','https://bit.ly/knowledge111', 37.12);
 INSERT INTO Publications(title, ptype, dop, url, price) 
 VALUES ('SERVO', 'magazine', '2019-09-18','https://www.servomagazine.com/', 17.09);
 INSERT INTO Publications(title, ptype, dop, url, price) 
-VALUES ('Journal of Computer Science & Systems Biology', 'journal', '2016-10-01','https://www.omicsonline.org/computer-science-systems-biology.php', 27.99);
+VALUES ('Journal of Computer Science', 'journal', '2016-10-01','https://bit.ly/33LjpLP', 27.99);
 INSERT INTO Publications(title, ptype, dop, url, price) 
-VALUES ('Insights in Biomedicine', 'journal', '2018-12-21','https://biomedicine.imedpub.com/', 46.69);
+VALUES ('Insights in Biomedicine', 'journal', '2018-12-21','https://bit.ly/2xYgxzd', 46.69);
 INSERT INTO Publications(title, ptype, dop, url, price) 
-VALUES ('Database Design for Mere Mortals', 'book', '2014-09-05','https://www.goodreads.com/book/show/150062.Database_Design_for_Mere_Mortals', 18.78);
+VALUES ('Database Design for Mere Mortals', 'book', '2014-09-05','https://bit.ly/2U9M1el', 18.78);
 INSERT INTO Publications(title, ptype, dop, url, price) 
 VALUES ('Nature Communications', 'journal', '2016-04-20','https://www.nature.com/ncomms/', 25.21);
 INSERT INTO Publications(title, ptype, dop, url, price) 
-VALUES ('Earth Interactions', 'journal', '2015-10-08','https://journals.ametsoc.org/toc/eint/19/12', 16.98);
+VALUES ('Earth Interactions', 'journal', '2015-10-08','https://bit.ly/2vCgWGD', 16.98);
 INSERT INTO Publications(title, ptype, dop, url, price) 
-VALUES ('Birds and Blooms', 'magazine', '2019-07-20','https://www.magazine.store/birds-and-blooms/', 26.19);
+VALUES ('Birds and Blooms', 'magazine', '2019-07-20','https://bit.ly/2vIN7o4', 26.19);
 INSERT INTO Publications(title, ptype, dop, url, price) 
-VALUES ('Make Your Own Neural Network ', 'book', '2016-03-31','https://www.barnesandnoble.com/w/make-your-own-neural-network-tariq-rashid/1123691651', 15.91);
+VALUES ('Make Your Own Neural Network ', 'book', '2016-03-31','https://bit.ly/33xLR3B', 15.91);
 INSERT INTO Publications(title, ptype, dop, url, price) 
-VALUES ('Remote: Office Not Required', 'book', '2014-10-17','https://www.goodreads.com/book/show/17316682-remote', 18.99);
+VALUES ('Remote: Office Not Required', 'book', '2014-10-17','https://bit.ly/2QA1YIs', 18.99);
 INSERT INTO Publications(title, ptype, dop, url, price) 
-VALUES ('Bioinformatics and Functional Genomics', 'book', '2014-08-15', 'http://www.bioinfbook.org/php/?q=node/156', 35.09);
+VALUES ('Bioinformatics', 'book', '2014-08-15', 'https://bit.ly/2U8tJu4', 35.09);
 INSERT INTO Publications(title, ptype, dop, url, price) 
-VALUES ('Food for Today', 'book', '2014-11-09', 'https://app.oncoursesystems.com/school/webpage/11515833/1490563', 30.08);
+VALUES ('Food for Today', 'book', '2014-11-09', 'https://bit.ly/2xhTC1e', 30.08);
+
+-- INSERT INTO Publications(title, ptype, dop, url, price) 
+-- VALUES ('Knowledge Engineering', 'book', '2019-11-08','https://bit.ly/3bgorSY', 35.11);
+
 
 -- Books --
 INSERT INTO Books(pid, ISBN, edition) VALUES (1, '89-15-28-237106-32', 2);
@@ -205,6 +231,8 @@ INSERT INTO Books(pid, ISBN, edition) VALUES (9, '92-14-123-89175-05', 3);
 INSERT INTO Books(pid, ISBN, edition) VALUES (10, '978-3-319-69548-8', 1);
 INSERT INTO Books(pid, ISBN, edition) VALUES (11, '23-92-597-21149-76', 3);
 INSERT INTO Books(pid, ISBN, edition) VALUES (12, '18-48-2-86528-09', 2);
+
+-- INSERT INTO Books(pid, ISBN, edition) VALUES (13, '89-15-28-359806-30', 3);
 
 -- Periodic Publications --
 INSERT INTO PeriodicPublication(pid, periodicity, pptype) VALUES (2, 2, 'journal');
@@ -222,35 +250,44 @@ INSERT INTO Issue (pid, ino) VALUES (6, 2);
 INSERT INTO Issue (pid, ino) VALUES (7, 2);
 INSERT INTO Issue (pid, ino) VALUES (8, 3);
 
+
 -- Chapters --
-INSERT INTO Chapters(pid, chno, chtitle, url) 
-VALUES (1, 3, 'Diversified Semantic Query Reformulation', 'https://www.springer.com/gp/book/9783319695471');
-INSERT INTO Chapters(pid, chno, chtitle, url) 
-VALUES (5, 4, 'Query Execution', 'https://link.springer.com/chapter/10.1007/978-1-4302-4660-2_14');
-INSERT INTO Chapters(pid, chno, chtitle, url) 
-VALUES (9, 5, 'Pairwise Alignment', 'http://www.bioinfbook.org/php/?q=C3E3');
-INSERT INTO Chapters(pid, chno, chtitle, url) 
-VALUES (10, 2, 'Stop the commute', 'http://v.fastcdn.co/u/3a1b1cdf/28217077-0-Remote-Office-Not-Re.pdf');
-INSERT INTO Chapters(pid, chno, chtitle, url) 
-VALUES (11, 3, 'Reviewing Data Integrity', 'https://flylib.com/books/en/1.199.1.135/1/');
-INSERT INTO Chapters(pid, chno, chtitle, url) 
-VALUES (12, 6, 'Planning Daily Food Choices', 'https://www.mheducation.com/prek-12/product/food-today-student-edition-mcgraw-hill/9780026430487.html#tab-content-tableOfContents');
+INSERT INTO Chapters(pid, chno, chtitle, url, modifyDate) 
+VALUES (1, 3, 'Semantic Query Reformulation', 'https://bit.ly/tsrt112', '2017-10-20');
+INSERT INTO Chapters(pid, chno, chtitle, url, modifyDate) 
+VALUES (5, 4, 'Query Execution', 'https://bit.ly/3aa41uL', '2014-08-08');
+INSERT INTO Chapters(pid, chno, chtitle, url, modifyDate) 
+VALUES (9, 5, 'Pairwise Alignment', 'https://bit.ly/33CbzUk', '2016-03-01');
+INSERT INTO Chapters(pid, chno, chtitle, url, modifyDate) 
+VALUES (10, 2, 'Stop the commute', 'https://bit.ly/2wgXcJd', '2014-09-27');
+INSERT INTO Chapters(pid, chno, chtitle, url, modifyDate) 
+VALUES (11, 3, 'Reviewing Data Integrity', 'https://bit.ly/2JgFDff', '2014-07-10');
+INSERT INTO Chapters(pid, chno, chtitle, url, modifyDate) 
+VALUES (12, 6, 'Planning Daily Food Choices', 'https://bit.ly/3a9Uq70', '2014-10-10');
+
+-- INSERT INTO Chapters(pid, chno, chtitle, url, modifyDate) 
+-- VALUES (12, 5, 'Cooking Catastrophe', 'https://amzn.to/3abX1gI', '2014-10-11');
+
 
 -- Articles --
 INSERT INTO Articles(atitle, doc, url) 
-VALUES ('The Second Term', '2014-06-05', 'https://www.newyorker.com/magazine/2012/06/18/the-second-term');
+VALUES ('The Second Term', '2014-06-05', 'https://bit.ly/3dhzT2h');
 INSERT INTO Articles(atitle, doc, url) 
-VALUES ('Come to Happyland', '2014-09-02', 'https://www.outsideonline.com/1910091/come-happyland?page=all');
+VALUES ('Come to Happyland', '2014-09-02', 'https://bit.ly/2U8TsT9');
 INSERT INTO Articles(atitle, doc, url) 
-VALUES('Miami Underwater', '2015-12-14', 'https://www.newyorker.com/magazine/2015/12/21/the-siege-of-miami');
+VALUES('Miami Underwater', '2015-12-14', 'https://bit.ly/3dmeZiS');
 INSERT INTO Articles(atitle, doc, url) 
-VALUES('Philip Glass', '2016-10-20', 'https://www.interviewmagazine.com/music/philip-glass#_');
+VALUES('Philip Glass', '2016-10-20', 'https://bit.ly/3aa4e11');
 INSERT INTO Articles(atitle, doc, url) 
-VALUES('Vanishing Act', '2014-12-27', 'http://www.slate.com/articles/arts/music_box/2009/12/vanishing_act.html');
+VALUES('Vanishing Act', '2014-12-27', 'https://bit.ly/3a8LLBH');
 INSERT INTO Articles(atitle, doc, url) 
-VALUES('The Ghosts of the Glacier', '2018-10-09', 'https://www.gq.com/story/missing-parents-melting-glacier-swiss-alps');
+VALUES('The Ghosts of the Glacier', '2018-10-09', 'https://bit.ly/3bfWHxA');
 INSERT INTO Articles(atitle, doc, url) 
-VALUES('Jane Goodall Is Still Wild at Heart', '2019-08-08','https://www.nytimes.com/2015/03/15/magazine/jane-goodall-is-still-wild-at-heart.html');
+VALUES('Jane Goodall Is Still Wild at Heart', '2019-08-08','https://nyti.ms/2QxkD7M');
+
+-- INSERT INTO Articles(atitle, doc, url) 
+-- VALUES('The last house in Rosewood', '2019-10-15','https://bit.ly/2J7Masy');
+
 
 -- Topics --
 INSERT INTO Topics (topic) VALUES ('animals');
@@ -281,6 +318,7 @@ INSERT INTO Orders (price, copies, shcost, odate) VALUES (48.69, 700, 29.99, '20
 INSERT INTO Orders (price, copies, shcost, odate) VALUES (39.12, 550, 35.59, '2018-02-28'); -- 1 pid 
 INSERT INTO Orders (price, copies, shcost, odate) VALUES (17.91, 550, 35.59, '2018-09-28'); -- 9 pid
 
+-- INSERT INTO Orders (price, copies, shcost, odate) VALUES (17.91, 180, 25.18, '2019-03-20'); -- 9 pid
 
 -- Distributors --
 INSERT INTO Distributors (dname, dtype, city, address, contact, phno, tot_balance) 
@@ -306,6 +344,10 @@ VALUES ('John C. Hodges Library', 'library', 'Knoxville', '1015 Volunteer Blvd',
 INSERT INTO Distributors (dname, dtype, city, address, contact, phno, tot_balance) 
 VALUES ('Firestorm Books & Coffee', 'bookstore', 'Asheville', '610 Haywood Rd #B', 'Peter Barringtone', '828-255-8115', 0);
 
+-- INSERT INTO Distributors (dname, dtype, city, address, contact, phno, tot_balance) 
+-- VALUES ('Books-A-Million', 'bookstore', 'Knoxville', '8507 Kingston Pike', 'Harry Palowski', '865-691-2665', 0);
+
+
 -- Edit --
 INSERT INTO Edit (pid, sid, sdate) VALUES (2, 10, '2015-08-12');
 INSERT INTO Edit (pid, sid, sdate) VALUES (1, 5, '2016-08-20');
@@ -328,6 +370,8 @@ INSERT INTO WriteArticle (aid, sid, sdate) VALUES (4, 3, '2015-11-27');
 INSERT INTO WriteArticle (aid, sid, sdate) VALUES (5, 9, '2014-11-22');
 INSERT INTO WriteArticle (aid, sid, sdate) VALUES (6, 7, '2018-02-24');
 INSERT INTO WriteArticle (aid, sid, sdate) VALUES (7, 4, '2019-01-29');
+
+-- INSERT INTO WriteArticle (aid, sid, sdate) VALUES (8, 4, '2019-01-29');
 
 -- WriteBook --
 INSERT INTO WriteBook (pid, sid, sdate) VALUES (1, 8, '2016-09-01');
@@ -367,6 +411,8 @@ INSERT INTO MakeOrder (did, oid) VALUES (4, 2);
 INSERT INTO MakeOrder (did, oid) VALUES (6, 4);
 INSERT INTO MakeOrder (did, oid) VALUES (3, 13);
 
+-- INSERT INTO MakeOrder (did, oid) VALUES (1, 14);
+
 -- ConsistOf --
 INSERT INTO ConsistOf (oid, pid) VALUES (1, 7);
 INSERT INTO ConsistOf (oid, pid) VALUES (10, 9);
@@ -382,6 +428,8 @@ INSERT INTO ConsistOf (oid, pid) VALUES (2, 2);
 INSERT INTO ConsistOf (oid, pid) VALUES (4, 8);
 INSERT INTO ConsistOf (oid, pid) VALUES (13, 9);
 
+-- INSERT INTO ConsistOf (oid, pid) VALUES (14, 9);
+
 
 -- ContainArticle --
 INSERT INTO ContainArticle (pid, aid) VALUES (2, 7);
@@ -392,4 +440,146 @@ INSERT INTO ContainArticle (pid, aid) VALUES (7, 1);
 INSERT INTO ContainArticle (pid, aid) VALUES (8, 4);
 INSERT INTO ContainArticle (pid, aid) VALUES (7, 5);
 
+/**
 
+DELETE FROM Publication
+WHERE pid = 13;
+
+
+SELECT *
+FROM Edit e NATURAL JOIN Publications p
+WHERE sid = 2;
+
+UPDATE WriteArticle
+SET sid = 11 and sdate = '2014-06-10'
+WHERE aid = 5;
+
+SELECT atitle
+FROM Articles
+NATURAL JOIN ContainArticle
+NATURAL JOIN (
+	SELECT pid, dop FROM Publications
+    ) as Publication
+WHERE dop = "2019-09-18";
+
+SELECT atitle
+FROM Articles a JOIN WriteArticle w
+ON a.aid = w.aid JOIN Staff s
+ON w.sid = s.sid
+WHERE sname = "Samwise Gamgee";
+
+SELECT did, dname, pid, copies, price, shcost, odate, 
+Round(SUM(copies)*price+shcost, 2) as total_price
+FROM Distributors 
+NATURAL JOIN Makeorder 
+NATURAL JOIN Orders NATURAL JOIN ConsistOf
+group by oid
+ORDER BY did;
+
+SELECT did, dname, oid, pid,
+COUNT(*) AS n_orders, 
+SUM(copies) AS n_copies, 
+Round(SUM(copies)*price+shcost, 2) as total_price, 
+MONTHNAME(t.odate) as month,
+YEAR(t.odate) as year
+FROM
+(SELECT did, dname, pid, copies, price, shcost, odate
+FROM Distributors 
+NATURAL JOIN Makeorder 
+NATURAL JOIN Orders NATURAL JOIN ConsistOf) t
+GROUP BY did, MONTHNAME(t.odate), YEAR(t.odate)
+ORDER BY did;
+
+
+WITH Prices AS (
+SELECT did, ROUND(price*copies+shcost,2) AS price, 
+MONTHNAME(odate) AS Month, YEAR(odate) AS YEAR
+FROM MakeORder
+NATURAL JOIN Orders)
+SELECT did, Month, Year, SUM(price) AS Cost
+FROM Prices
+GROUP BY did, Month, Year
+ORDER BY did;
+**/
+
+/** Report: Copies, Total price 
+
+WITH Prices AS (
+SELECT did, dname, copies, ROUND(price*copies+shcost,2) AS price, 
+MONTHNAME(odate) AS Month, YEAR(odate) AS YEAR  
+FROM MakeORder
+NATURAL JOIN Orders
+NATURAL JOIN Distributors)
+SELECT did, dname, COUNT(*) as n_orders, 
+SUM(copies) as copies, SUM(price) AS Cost,
+Month, Year
+FROM Prices
+GROUP BY did, Month, Year
+ORDER BY did;
+
+WITH Prices AS (
+SELECT did, dname, copies, ROUND(price*copies+shcost,2) AS price, 
+MONTHNAME(odate) AS Month, YEAR(odate) AS YEAR  
+FROM MakeORder
+NATURAL JOIN Orders
+NATURAL JOIN Distributors)
+SELECT did, dname, COUNT(*) as n_orders, 
+SUM(copies) as copies, SUM(price) AS Cost,
+month, year
+FROM Prices
+WHERE did = 3 AND month = "January" AND year = 2020
+GROUP BY did, month, year;
+
+select Round(SUM(copies)*t.price) as Revenue
+from publications p, (select * from orders natural join consistof) t
+where p.pid = t.pid;
+
+-- Total Revenue
+WITH Prices AS (
+SELECT ROUND(price*copies+shcost, 2) AS price
+FROM Orders)
+SELECT ROUND(SUM(price), 2) AS Revenue
+FROM Prices;
+
+
+
+
+SELECT did, dname, MONTHNAME(odate), SUM(copies)
+FROM Distributors 
+NATURAL JOIN Makeorder
+NATURAL JOIN Orders
+GROUP BY did, MONTHNAME(odate), YEAR(odate);
+
+**/
+
+/** Queries: Orders 
+
+INSERT INTO Orders(price, copies, shcost, odate)
+VALUES (
+	(SELECT price + 2
+    FROM Publications NATURAL JOIN Books
+    WHERE title = "Make Your Own Neural Network " and edition = 3),
+    200, 13.49, "2020-01-20"
+);
+
+INSERT INTO MakeOrder (did, oid) 
+VALUES (
+	(SELECT did
+    FROM Distributors
+    WHERE address = "1875 Sherman Ave"),
+    18
+);
+
+INSERT INTO ConsistOf (oid, pid) 
+VALUES (15,
+	(SELECT pid
+    FROM Publications NATURAL JOIN Books
+    WHERE title = "Make Your Own Neural Network " and edition = 3)
+);
+
+SELECT oid
+FROM Orders NATURAL JOIN ConsistOf
+NATURAL JOIN Publications NATURAL JOIN Books
+WHERE title = "Make Your Own Neural Network " and edition = 3;
+
+**/
