@@ -11,10 +11,68 @@ public class WolfPubInit {
     public static void enterPublicationInfo(){
         //Inserts new tuples into the Publications table
         try{
-            String title, ptype, dop, url, price;
+            String title, editor, topic, edition, ISBN number,
+                    dop, doi, ptext,  url, price;
+            int type;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Please enter the title of the publication:");
             title = br.readLine();
+<<<<<<< HEAD
+=======
+            System.out.println("Please enter the name of editor: ");
+            editor = br.readLine();
+            System.out.println("Please enter topic of the publication: ");
+            topic = br.readLine();
+            System.out.println("Please choose type of publication: " +
+                    "1. Book" +
+                    "2. Magazine" +
+                    "3. Journal");
+            ptype = br.readLine();
+                if(ptype = 1){
+                    System.out.println("Please enter the name of author: "); /*When user chooses 1, new book has to be inserted into Publications
+                                                                                and BOOKS tables*/
+
+                    author = br.readLine();
+                    System.out.println("Please enter ISBN number: "); //integer or string?
+                    ISBN = br.readLine();
+                    System.out.println("Please enter edition: ");
+                    edition = br.readLine();
+                    System.out.println("Please enter publication date: ");
+                    publication date = br.readLine();
+                    System.out.println("Please enter URL: ");
+                    URL = br.readLine();
+                    System.out.println("Please enter price: ");
+                    price = br.readLine();
+
+                    try{
+                        connection.setAutoCommit(false); //set autocommit false
+                        statement.executeUpdate("INSERT INTO Publications(title, ptype, topic, editor, dop, url" +
+                                "price) "+
+                                "VALUES (" +"'" + title + "' ,book, '" + topic + "','"
+                                + editor + "'," + dop + ", '" + url + "', '" + price +  ")"); //insert new publication into Publications
+                        statement.executeUpdate("INSERT INTO BOOKS(pid, ISBN, edition)" +
+                                "VALUES (" + "(SELECT pid FROM Publications WHERE title = '"  + title + "'" + "AND editor = '" + editor + "'" + "AND topic = '" + topic + "'" + ")"
+                                + ", '" + ISBN + "', '" + edition + "'" + ")"); // Inserting new book into BOOKS
+                        connection.commit(); //commits the transaction to the database if no error has been detected
+                        System.out.println( "\nTransaction Success!!" );
+                    }
+                    catch (SQLException sqlE) // the SQL was malformed
+                    {
+                        //If error is found, the transaction is rolled back and the table is returned to its previous state
+                        System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
+                        System.out.println( sqlE.getMessage() ); // print SQL error message
+                        connection.rollback(); //rollback transaction
+                        connection.setAutoCommit(true); //reset autocommit to true
+                    }
+
+
+                }
+
+
+            System.out.println("Please enter edition of the Book: ");
+            edition = br.readLine();
+            System.out.println("Edition entered: " + edition);
+>>>>>>> 07f8181f0474d3cde72badc62faba69b00a34903
 
         }
         catch (Exception e) {
