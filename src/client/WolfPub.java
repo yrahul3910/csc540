@@ -13,7 +13,7 @@ public class WolfPubInit {
         try{
             String title, editor, topic, edition, ISBN number,
                     dop, doi, ptext,  url, price;
-            int type;
+            int ptype;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Please enter the title of the publication:");
             title = br.readLine();
@@ -89,17 +89,15 @@ public class WolfPubInit {
             String ISBN, edition;
 
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
-            System.out.println("Please enter ISBN of the book:");
+            System.out.println("Please enter ISBN of the book: ");
             ISBN = br.readLine();
-            System.out.println("ISBN entered: " + ISBN);
             System.out.println("Please enter edition of the Book: ");
             edition = br.readLine();
-            System.out.println("Edition entered: " + edition);
 
             try{
                 connection.setAutoCommit(false); //set autocommit to false
                 statement.executeUpdate("INSERT INTO Books(ISBN, edition) "+
-                        "VALUES ( " +"'" + ISBN + "' ,'"+ edition + "'" + ");"); //inserts a row in the Book's table with the appropriate values
+                        "VALUES ( " +"'" + ISBN + "', '"+ edition + "'" + ");"); //inserts a row in the Book's table with the appropriate values
                 connection.commit(); //commit the transaction if there is no error
                 System.out.println( "\nTransaction Success!" ); //print error message
             }
@@ -120,15 +118,18 @@ public class WolfPubInit {
         }
     }
 
+    /**
+     *
+     */
     public static void updateBookInfo(){
-        //Asks user to enter new information about customer
+        //Asks user to enter new information about book
         try{
             String ISBN, edition;
             int isOK = -1;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Please enter the ISBN of the book you want to update:");
+            System.out.println("Please enter the ISBN of the book you want to update: ");
             ISBN = br.readLine();
-            System.out.println("Please enter the new edition of the Book:");
+            System.out.println("Please enter the new edition of the Book: ");
             edition = br.readLine();
 
             try{
@@ -151,6 +152,152 @@ public class WolfPubInit {
         {
             System.out.println( "There was an error: " + e.getMessage() );
         }
+    }
+
+    /**
+     * Search for books written by particular author
+     */
+    public static void findBooksByAuthor() {
+        String title, ISBN, edition, sname;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
+            System.out.println("Please enter full name of the author: ");
+            sname = br.readLine();
+            result = statement.executeQuery("SELECT title, ISBN, edition FROM Books NATURAL JOIN Publications " +
+                    "NATURAL JOIN Staff NATURAL JOIN WriteBook WHERE sname = '" + sname + "'");
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Search for books published on particular date
+     */
+    public static void findBooksByDate() {
+        String title, ISBN, edition, dop;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
+            System.out.println("Please enter book's date of publishing");
+            System.out.println("The date should be in the form YYYY-MM-DD (i.e. 2020-02-02) ");
+            dop = br.readLine();
+            result = statement.executeQuery("SELECT title, edition, ISBN FROM Books NATURAL JOIN Publications " +
+                    "WHERE dop = '" + dop + "'");
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Search for books by particular topics
+     */
+    public static void findBooksByTopic() {
+        String title, edition, ISBN, topics;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
+            System.out.println("Please enter the topic of the book: ");
+            topics = br.readLine();
+            result = statement.executeQuery("SELECT title, edition, ISBN FROM Books NATURAL JOIN Publications " +
+                    "WHERE topics LIKE '%" + topics + "%'");
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * Search for articles written by particular author
+     */
+    public static void findArticleByAuthor() {
+        String sname, atitle, atext;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
+            System.out.println("Please enter full name of the author: ");
+            sname = br.readLine();
+            result = statement.executeQuery("SELECT atitle, atext FROM Articles NATURAL JOIN Staff " +
+                    "NATURAL JOIN WriteArticle WHERE sname = '" + sname + "'");
+
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Search for articles published on particular date
+     */
+    public static void findArticleByDate() {
+        String atitle, atext, dop;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
+            System.out.println("Please enter article's date of publishing");
+            System.out.println("The date should be in the form YYYY-MM-DD (i.e. 2020-02-02) ");
+            dop = br.readLine();
+            result = statement.executeQuery("SELECT atitle, atext FROM Articles NATURAL JOIN ContainArticle " +
+                    "NATURAL JOIN (SELECT pid, dop FROM Publications) as Publication WHERE dop = '" + dop + "'");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Search for articles by particular topics
+     */
+    public static void findArticleByAuthor() {
+        String atopics, atitle, atext;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
+            System.out.println("Please enter the topic of the article: ");
+            atopics = br.readLine();
+            result = statement.executeQuery("SELECT atitle, atext" +
+                    "FROM Articles WHERE atopics LIKE '%" + atopics + "%';");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+    public static void enterEmployeePayment(){
+        try {
+            int sid;
+            String paycheck, paydate;
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Please enter staff id: ");
+            sid = br.readLine();
+            System.out.println("Please enter paycheck amount: ");
+            paycheck = br.readLine();
+            System.out.println("Please enter date of payment: ");
+            sid = br.readLine();
+
+            try {
+                connection.setAutoCommit(false); //set autocommit to false
+                statement.executeUpdate("INSERT INTO Payments (sid, paycheck, paydate)" +
+                        "VALUES (" + "'" + sid + "', '" + paycheck + "', '" + paydate + "');");
+                connection.commit(); //commit the transaction if there is no error
+                System.out.println( "\nTransaction Success!" );
+            }
+            catch {
+                System.out.print( "An error occurred: " );
+                System.out.println(sqlE); //print the error message
+                connection.rollback(); //rollback the transaction
+                connection.setAutoCommit(true); //set autocommit to true
+            }
+
+        }
+        catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
+        }
+
+
     }
 
 
@@ -182,7 +329,7 @@ public class WolfPubInit {
                 connection.setAutoCommit(false); //set autocommit to false
                 statement.executeUpdate("INSERT INTO Distributors(dname, dtype, city, address, contact, phno, tot_balance) "+
                         "VALUES (" + "'" + dname + "' ,'"+ dtype +  "', '" + city + "', "
-                        + address + ", '"  + contact + "', '" + phno + "', " + tot_balance + "'" + ");"); //insert a tuple into the distributors' table
+                        + address + ", '"  + contact + "', '" + phno + "', " + tot_balance + "');"); //insert a tuple into the distributors' table
                 connection.commit(); //commit the transaction if there is no error
                 System.out.println( "\nTransaction Success!" );
             }

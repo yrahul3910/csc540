@@ -128,7 +128,7 @@ CREATE TABLE PeriodicPublication (
 pid INT NOT NULL,
 periodicity VARCHAR(50) NOT NULL,
 pptype VARCHAR(30) NOT NULL,
-pptext LONGTEXT,
+pptext LONGTEXT NOT NULL,
 doi DATE,
 FOREIGN KEY(pid) REFERENCES Publications(pid)
 ON UPDATE CASCADE
@@ -157,20 +157,23 @@ INSERT INTO Issue (pid, ino)
 VALUES (1005, 1);
 
 
+-- atopics attribute was added
 CREATE TABLE Articles(
 aid INT AUTO_INCREMENT PRIMARY KEY,
 atitle VARCHAR(350) NOT NULL,
+atopics VARCHAR(100),
 doc DATE,
 atext MEDIUMTEXT NOT NULL,
 url VARCHAR(2048)
 ) AUTO_INCREMENT = 5001;
 
-INSERT INTO Articles(atitle, doc, atext, url) 
-VALUES ('Spatio-Temporal Database Research', '2018-09-02', 'Spatio-Temporal', 'https://bit.ly/3aRwIgq');
-INSERT INTO Articles(atitle, doc, atext, url) 
-VALUES('Miami Underwater', '2019-12-14', 'Miami Beach', 'https://bit.ly/3dmeZiS');
-INSERT INTO Articles(atitle, doc, atext, url) 
-VALUES('Vanishing Act', '2018-12-27', 'Vanishing Act', 'https://bit.ly/3a8LLBH');
+
+INSERT INTO Articles(atitle, atopics, doc, atext, url) 
+VALUES('Spatio-Temporal Database in Hospitals', 'database, health', '2018-09-02', 'Spatio-Temporal', 'https://bit.ly/3aRwIgq');
+INSERT INTO Articles(atitle, atopics, doc, atext, url) 
+VALUES('Miami Underwater', 'nature', '2019-12-14', 'Miami Beach', 'https://bit.ly/3dmeZiS');
+INSERT INTO Articles(atitle, atopics, doc, atext, url) 
+VALUES('Vanishing Act', 'science', '2018-12-27', 'Vanishing Act', 'https://bit.ly/3a8LLBH');
 
 
 CREATE TABLE Distributors(
@@ -278,6 +281,8 @@ VALUES (1004, 3001);
 INSERT INTO Edit (pid, sid)
 VALUES (1005, 3002);
 
+-- INSERT INTO Edit (pid, sid) VALUES (1002, 3001);
+
 
 CREATE TABLE WriteArticle(
 aid INT NOT NULL,
@@ -306,6 +311,7 @@ INSERT INTO WriteBook (pid, sid)
 VALUES (1001, 3003);
 INSERT INTO WriteBook (pid, sid)
 VALUES (1004, 3005);
+
 
 /**
 CREATE TABLE Topics(
