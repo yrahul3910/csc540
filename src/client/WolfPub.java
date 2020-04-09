@@ -7,52 +7,63 @@ import java.sql.Statement;
 
 public class WolfPubInit {
 
+    /**
+     *Entering new publication (book, magazine or journal)
+     */
+
 
     public static void enterPublicationInfo(){
+<<<<<<< HEAD
         //Inserts new tuples into the Publications table
         try{
             String title, editor, topic, edition, ISBN number,
                     dop, doi, ptext,  url, price;
+=======
+            try{
+            String title, editor, topics, edition, ISBN number, periodicity,
+                    dop, doc, doi, pptext, atext, url, price;
+>>>>>>> 953d9afd93d0c62675361aceb3402536e40765b6
             int ptype;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Please enter the title of the publication:");
             title = br.readLine();
 <<<<<<< HEAD
 =======
-            System.out.println("Please enter the name of editor: ");
-            editor = br.readLine();
-            System.out.println("Please enter topic of the publication: ");
-            topic = br.readLine();
             System.out.println("Please choose type of publication: " +
-                    "1. Book" +
-                    "2. Magazine" +
-                    "3. Journal");
+                    "\n1. Book\n" +
+                    "\n2. Magazine\n" +
+                    "\n3. Journal\n" +
+                    "\n4. Article\n");
             ptype = br.readLine();
                 if(ptype = 1){
+                    System.out.println("Please enter the name of editor: "); //maybe we add here command "press "/" if you don't
+                    editor = br.readLine();                                                        // editor's name"??
+                    System.out.println("Please enter topic of the publication: ");  // the same with topic cause we allow NULLs there
+                    topics = br.readLine();
                     System.out.println("Please enter the name of author: "); /*When user chooses 1, new book has to be inserted into Publications
                                                                                 and BOOKS tables*/
-
                     author = br.readLine();
                     System.out.println("Please enter ISBN number: "); //integer or string?
                     ISBN = br.readLine();
                     System.out.println("Please enter edition: ");
                     edition = br.readLine();
                     System.out.println("Please enter publication date: ");
-                    publication date = br.readLine();
+                    dop = br.readLine();
                     System.out.println("Please enter URL: ");
-                    URL = br.readLine();
+                    url = br.readLine();
                     System.out.println("Please enter price: ");
                     price = br.readLine();
 
                     try{
                         connection.setAutoCommit(false); //set autocommit false
-                        statement.executeUpdate("INSERT INTO Publications(title, ptype, topic, editor, dop, url" +
+                        statement.executeUpdate("INSERT INTO Publications(title, ptype, topics, editor, dop, url" +
                                 "price) "+
-                                "VALUES (" +"'" + title + "' ,book, '" + topic + "','"
+                                "VALUES (" +"'" + title + "' ,book, '" + topics + "','"
                                 + editor + "'," + dop + ", '" + url + "', '" + price +  ")"); //insert new publication into Publications
                         statement.executeUpdate("INSERT INTO BOOKS(pid, ISBN, edition)" +
-                                "VALUES (" + "(SELECT pid FROM Publications WHERE title = '"  + title + "'" + "AND editor = '" + editor + "'" + "AND topic = '" + topic + "'" + ")"
-                                + ", '" + ISBN + "', '" + edition + "'" + ")"); // Inserting new book into BOOKS
+                                "VALUES (" + "(SELECT pid FROM Publications WHERE title = '"  + title + "'" + "AND ptype = book )"
+                                + ", '" + ISBN + "', '" + edition + "'" + ")"); // Inserting new book into BOOKS.
+                                                                                //should we do two seperate transactions for fetching pid?
                         connection.commit(); //commits the transaction to the database if no error has been detected
                         System.out.println( "\nTransaction Success!!" );
                     }
@@ -67,11 +78,119 @@ public class WolfPubInit {
 
 
                 }
+                // if user wants enter magazine we have to insert it into Publications and PeriodicPublications tables
+                // what about issue number? Let's just add it into Publications table
+                else if (ptype = 2) {
+                    System.out.println("Please enter the name of editor: "); //maybe we add here command "press "/" if you don't
+                    editor = br.readLine();                                                        // editor's name"??
+                    System.out.println("Please enter topic of the publication: ");  // the same with topic cause we allow NULLs there
+                    topics = br.readLine();
+                    System.out.println("Please enter the periodicity: ");
+                    periodicity = br.readLine();
+                    // pptype isn't it redundant? Because we have ptype in Publications
+                    System.out.println("Please enter text of magazine: "); //integer or string?
+                    pptext = br.readLine();
+                    System.out.println("Please enter date of issue: ");
+                    doi = br.readLine();
+                    System.out.println("Please enter publication date: ");
+                    dop = br.readLine();
+                    System.out.println("Please enter URL: ");
+                    url = br.readLine();
+                    System.out.println("Please enter price: ");
+                    price = br.readLine();
+
+                    try {
+                        connection.setAutoCommit(false);
+
+                        statement.executeUpdate("INSERT INTO Publications(title, ptype, topics, editor, dop, url" +
+                                "price) "+
+                                "VALUES (" +"'" + title + "' ,magazine, '" + topics + "','"
+                                + editor + "'," + dop + ", '" + url + "', '" + price +  ")");
+                        statement.executeUpdate("INSERT INTO PeriodicPublication(pid, periodicity, ptype, pptext, doi)" +
+                                "VALUES (" + "(SELECT pid FROM Publications WHERE title = '"  + title + "'" + "AND ptype = book )"
+                                + ", '" + periodicity + "', '" + ptype + "', '" + pptext + "', '" + doi + "'" + ")");
+                        connection.commit(); //commits the transaction to the database if no error has been detected
+                        System.out.println( "\nTransaction Success!!" );
+                    }
+                    catch (SQLException sqlE) // the SQL was malformed
+                    {
+                        //If error is found, the transaction is rolled back and the table is returned to its previous state
+                        System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
+                        System.out.println( sqlE.getMessage() ); // print SQL error message
+                        connection.rollback(); //rollback transaction
+                        connection.setAutoCommit(true); //reset autocommit to true
+                    }
 
 
-            System.out.println("Please enter edition of the Book: ");
-            edition = br.readLine();
-            System.out.println("Edition entered: " + edition);
+                }
+                else if (ptype = 3) {
+                    System.out.println("Please enter the name of editor: "); //maybe we add here command "press "/" if you don't
+                    editor = br.readLine();                                                        // editor's name"??
+                    System.out.println("Please enter topic of the publication: ");  // the same with topic cause we allow NULLs there
+                    topics = br.readLine();
+                    System.out.println("Please enter the periodicity: ");
+                    periodicity = br.readLine();
+                    // pptype isn't it redundant? Because we have ptype in Publications
+                    System.out.println("Please enter text of magazine: "); //integer or string?
+                    pptext = br.readLine();
+                    System.out.println("Please enter date of issue: ");
+                    doi = br.readLine();
+                    System.out.println("Please enter publication date: ");
+                    dop = br.readLine();
+                    System.out.println("Please enter URL: ");
+                    url = br.readLine();
+                    System.out.println("Please enter price: ");
+                    price = br.readLine();
+                    try {
+                        connection.setAutoCommit(false);
+
+                        statement.executeUpdate("INSERT INTO Publications(title, ptype, topics, editor, dop, url" +
+                                "price) "+
+                                "VALUES (" +"'" + title + "' ,journal, '" + topics + "','"
+                                + editor + "'," + dop + ", '" + url + "', '" + price +  ")");
+                        statement.executeUpdate("INSERT INTO PeriodicPublication(pid, periodicity, ptype, pptext, doi)" +
+                                "VALUES (" + "(SELECT pid FROM Publications WHERE title = '"  + title + "'" + "AND ptype = book )"
+                                + ", '" + periodicity + "', '" + ptype + "', '" + pptext + "', '" + doi + "'" + ")");
+                        connection.commit(); //commits the transaction to the database if no error has been detected
+                        System.out.println( "\nTransaction Success!!" );
+                    }
+                    catch (SQLException sqlE) // the SQL was malformed
+                    {
+                        //If error is found, the transaction is rolled back and the table is returned to its previous state
+                        System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
+                        System.out.println( sqlE.getMessage() ); // print SQL error message
+                        connection.rollback(); //rollback transaction
+                        connection.setAutoCommit(true); //reset autocommit to true
+                    }
+
+                }
+                else if (ptype = 4){
+                    System.out.println("Please enter date of creation of the article: "); // or press "/" if you don't know?
+                    doc = br.readLine();
+                    System.out.println("Please enter text of the article: ");
+                    atext = br.readLine();
+                    System.out.println("Please enter URL: ");
+                    url = br.readLine();
+                    try {
+                        connection.setAutoCommit(false);
+
+                        statement.executeUpdate("INSERT INTO Articles(atitle, doc, atext, url)"+
+                                "VALUES (" +"'" + title + "', '" + doc + "', '"
+                                + atext + "', '"  + url + "')");
+                        connection.commit(); //commits the transaction to the database if no error has been detected
+                        System.out.println( "\nTransaction Success!!" );
+                    }
+                    catch (SQLException sqlE) // the SQL was malformed
+                    {
+                        //If error is found, the transaction is rolled back and the table is returned to its previous state
+                        System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
+                        System.out.println( sqlE.getMessage() ); // print SQL error message
+                        connection.rollback(); //rollback transaction
+                        connection.setAutoCommit(true); //reset autocommit to true
+                    }
+                }
+
+
 >>>>>>> 07f8181f0474d3cde72badc62faba69b00a34903
 
         }
@@ -118,23 +237,95 @@ public class WolfPubInit {
         }
     }
 
+<<<<<<< HEAD
     /**
      *
      */
     public static void updateBookInfo(){
         //Asks user to enter new information about book
+=======
+    public static void updatePublicationInfo(){
+        //Asks user to enter new information about Publication
         try{
-            String ISBN, edition;
-            int isOK = -1;
+            String pid, ISBN, edition;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Please enter publication ID:");
+            pid= br.readLine();
+            System.out.println("Please choose type of publication: " +
+                    "\n1. Book\n" +
+                    "\n2. Magazine\n" +
+                    "\n3. Journal\n" +
+                    "\n4. Article\n");
+            ptype = br.readLine();
+
+            if(ptype = 1) {
+                System.out.println("Please enter new name of editor: "); //maybe we add here command "press "/" if you don't
+                editor = br.readLine();                                                        // editor's name"??
+                System.out.println("Please enter new topic of the publication: ");  // the same with topic cause we allow NULLs there
+                topics = br.readLine();
+                System.out.println("Please enter new name of author: "); /*When user chooses 1, new book has to be inserted into Publications
+                                                                                and BOOKS tables*/
+                author = br.readLine();
+                System.out.println("Please enter ISBN number: "); //integer or string?
+                ISBN = br.readLine();
+                System.out.println("Please enter new edition: ");
+                edition = br.readLine();
+                System.out.println("Please enter new publication date: ");
+                dop = br.readLine();
+                System.out.println("Please enter new URL: ");
+                url = br.readLine();
+                System.out.println("Please enter new price: ");
+                price = br.readLine();
+
+                try {
+                    connection.setAutoCommit(false); //set autocommit false
+                    statement.executeUpdate("UPDATE Publications SET title = '%s', ptype = book, topics = '%s', " +
+                            "editor= '%s', dop = '%s', url = '%s', price= '%s') WHERE pid = = '%s'", title, topics, editor, dop, url, price, pid);
+                    statement.executeUpdate("UPDATE BOOKS SET ISBN = '%s', edition = '%s' WHERE pid = '%s')", ISBN, edition, pid);
+                    connection.commit(); //commits the transaction to the database if no error has been detected
+                    System.out.println("\nTransaction Success!!");
+                } catch (SQLException sqlE) // the SQL was malformed
+                {
+                    //If error is found, the transaction is rolled back and the table is returned to its previous state
+                    System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                    System.out.println(sqlE.getMessage()); // print SQL error message
+                    connection.rollback(); //rollback transaction
+                    connection.setAutoCommit(true); //reset autocommit to true
+                }
+
+            }
+
+        }
+        //catches any errors that may occur and quits
+        catch (Exception e)
+        {
+            System.out.println( "There was an error: " + e.getMessage() );
+        }
+    }
+
+
+
+
+    public static void updateBookInfo(){
+        //Asks user to enter new information about Book
+>>>>>>> 953d9afd93d0c62675361aceb3402536e40765b6
+        try{
+            String pid, ISBN, edition;
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+<<<<<<< HEAD
             System.out.println("Please enter the ISBN of the book you want to update: ");
+=======
+            System.out.println("Please enter publication ID:");
+            pid= br.readLine();
+            System.out.println("Please enter the ISBN of the book you want to update:");
+>>>>>>> 953d9afd93d0c62675361aceb3402536e40765b6
             ISBN = br.readLine();
             System.out.println("Please enter the new edition of the Book: ");
             edition = br.readLine();
 
             try{
                 connection.setAutoCommit(false); //set autocommit to false
-                statement.executeUpdate(String.format("UPDATE BOOKS SET ISBN='%s', edition ='%s' ", ISBN, edition));
+                statement.executeUpdate(String.format("UPDATE BOOKS SET ISBN='%s', edition ='%s' WHERE pid = '%s' ", ISBN, edition, pid));
                 connection.commit(); //if there is no error commit the transaction
                 System.out.println( "\nTransaction Success!" ); //print success message
             }
