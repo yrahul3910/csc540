@@ -13,22 +13,18 @@ public class WolfPubInit {
 
 
     public static void enterPublicationInfo(){
-<<<<<<< HEAD
         //Inserts new tuples into the Publications table
         try{
             String title, editor, topic, edition, ISBN number,
                     dop, doi, ptext,  url, price;
-=======
             try{
             String title, editor, topics, edition, ISBN number, periodicity,
                     dop, doc, doi, pptext, atext, url, price;
->>>>>>> 953d9afd93d0c62675361aceb3402536e40765b6
             int ptype;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Please enter the title of the publication:");
             title = br.readLine();
-<<<<<<< HEAD
-=======
+
             System.out.println("Please choose type of publication: " +
                     "\n1. Book\n" +
                     "\n2. Magazine\n" +
@@ -191,8 +187,6 @@ public class WolfPubInit {
                 }
 
 
->>>>>>> 07f8181f0474d3cde72badc62faba69b00a34903
-
         }
         catch (Exception e) {
             System.out.println("There is an error: " + e.getMessage());
@@ -237,13 +231,6 @@ public class WolfPubInit {
         }
     }
 
-<<<<<<< HEAD
-    /**
-     *
-     */
-    public static void updateBookInfo(){
-        //Asks user to enter new information about book
-=======
     public static void updatePublicationInfo(){
         //Asks user to enter new information about Publication
         try{
@@ -308,17 +295,13 @@ public class WolfPubInit {
 
     public static void updateBookInfo(){
         //Asks user to enter new information about Book
->>>>>>> 953d9afd93d0c62675361aceb3402536e40765b6
         try{
             String pid, ISBN, edition;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-<<<<<<< HEAD
             System.out.println("Please enter the ISBN of the book you want to update: ");
-=======
             System.out.println("Please enter publication ID:");
             pid= br.readLine();
             System.out.println("Please enter the ISBN of the book you want to update:");
->>>>>>> 953d9afd93d0c62675361aceb3402536e40765b6
             ISBN = br.readLine();
             System.out.println("Please enter the new edition of the Book: ");
             edition = br.readLine();
