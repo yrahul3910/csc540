@@ -10,10 +10,10 @@ public class WolfPubInit {
 
     public static void enterPublicationInfo(){
         //Inserts new tuples into the Publications table
-        try{
-            String title, editor, topic, edition, ISBN number,
-                    dop, doi, ptext,  url, price;
-            int type;
+            try{
+            String title, editor, topic, edition, ISBN number, periodicity,
+                    dop, doi, pptext,  url, price;
+            int ptype;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Please enter the title of the publication:");
             title = br.readLine();
@@ -29,14 +29,13 @@ public class WolfPubInit {
                 if(ptype = 1){
                     System.out.println("Please enter the name of author: "); /*When user chooses 1, new book has to be inserted into Publications
                                                                                 and BOOKS tables*/
-
                     author = br.readLine();
                     System.out.println("Please enter ISBN number: "); //integer or string?
                     ISBN = br.readLine();
                     System.out.println("Please enter edition: ");
                     edition = br.readLine();
                     System.out.println("Please enter publication date: ");
-                    publication date = br.readLine();
+                    dop = br.readLine();
                     System.out.println("Please enter URL: ");
                     URL = br.readLine();
                     System.out.println("Please enter price: ");
@@ -63,6 +62,84 @@ public class WolfPubInit {
                         connection.setAutoCommit(true); //reset autocommit to true
                     }
 
+
+                }
+                // if user wants enter magazine we have to insert it into Publications and PeriodicPublications tables
+                // what about issue number? Let's just add it into Publications table
+                if (ptype = 2) {
+                    System.out.println("Please enter the periodicity: ");
+                    periodicity = br.readLine();
+                    // pptype isn't it redundant? Because we have ptype in Publications
+                    System.out.println("Please enter text of magazine: "); //integer or string?
+                    pptext = br.readLine();
+                    System.out.println("Please enter date of issue: ");
+                    doi = br.readLine();
+                    System.out.println("Please enter publication date: ");
+                    dop = br.readLine();
+                    System.out.println("Please enter URL: ");
+                    URL = br.readLine();
+                    System.out.println("Please enter price: ");
+                    price = br.readLine();
+
+                    try {
+                        connection.setAutoCommit(false);
+
+                        statement.executeUpdate("INSERT INTO Publications(title, ptype, topic, editor, dop, url" +
+                                "price) "+
+                                "VALUES (" +"'" + title + "' ,magazine, '" + topic + "','"
+                                + editor + "'," + dop + ", '" + url + "', '" + price +  ")");
+                        statement.executeUpdate("INSERT INTO PeriodicPublication(pid, periodicity, ptype, pptext, doi)" +
+                                "VALUES (" + "(SELECT pid FROM Publications WHERE title = '"  + title + "'" + "AND editor = '" + editor + "'" + "AND topic = '" + topic + "'" + ")"
+                                + ", '" + periodicity + "', '" + ptype + "', '" + pptext + "', '" + doi + "'" + ")");
+                        connection.commit(); //commits the transaction to the database if no error has been detected
+                        System.out.println( "\nTransaction Success!!" );
+                    }
+                    catch (SQLException sqlE) // the SQL was malformed
+                    {
+                        //If error is found, the transaction is rolled back and the table is returned to its previous state
+                        System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
+                        System.out.println( sqlE.getMessage() ); // print SQL error message
+                        connection.rollback(); //rollback transaction
+                        connection.setAutoCommit(true); //reset autocommit to true
+                    }
+
+
+                }
+                if (ptype = 3) {
+                    System.out.println("Please enter the periodicity: ");
+                    periodicity = br.readLine();
+                    // pptype isn't it redundant? Because we have ptype in Publications
+                    System.out.println("Please enter text of magazine: "); //integer or string?
+                    pptext = br.readLine();
+                    System.out.println("Please enter date of issue: ");
+                    doi = br.readLine();
+                    System.out.println("Please enter publication date: ");
+                    dop = br.readLine();
+                    System.out.println("Please enter URL: ");
+                    URL = br.readLine();
+                    System.out.println("Please enter price: ");
+                    price = br.readLine();
+                    try {
+                        connection.setAutoCommit(false);
+
+                        statement.executeUpdate("INSERT INTO Publications(title, ptype, topic, editor, dop, url" +
+                                "price) "+
+                                "VALUES (" +"'" + title + "' ,journal, '" + topic + "','"
+                                + editor + "'," + dop + ", '" + url + "', '" + price +  ")");
+                        statement.executeUpdate("INSERT INTO PeriodicPublication(pid, periodicity, ptype, pptext, doi)" +
+                                "VALUES (" + "(SELECT pid FROM Publications WHERE title = '"  + title + "'" + "AND editor = '" + editor + "'" + "AND topic = '" + topic + "'" + ")"
+                                + ", '" + periodicity + "', '" + ptype + "', '" + pptext + "', '" + doi + "'" + ")");
+                        connection.commit(); //commits the transaction to the database if no error has been detected
+                        System.out.println( "\nTransaction Success!!" );
+                    }
+                    catch (SQLException sqlE) // the SQL was malformed
+                    {
+                        //If error is found, the transaction is rolled back and the table is returned to its previous state
+                        System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
+                        System.out.println( sqlE.getMessage() ); // print SQL error message
+                        connection.rollback(); //rollback transaction
+                        connection.setAutoCommit(true); //reset autocommit to true
+                    }
 
                 }
 
@@ -118,12 +195,51 @@ public class WolfPubInit {
         }
     }
 
-    public static void updateBookInfo(){
-        //Asks user to enter new information about customer
+    public static void updatePublicationInfo(){
+        //Asks user to enter new information about Publication
         try{
-            String ISBN, edition;
-            int isOK = -1;
+            String pid, ISBN, edition;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Please enter publication ID:");
+            pid= br.readLine();
+            System.out.println("Please choose type of publication: " +
+                    "1. Book" +
+                    "2. Magazine" +
+                    "3. Journal");
+            ptype = br.readLine();
+
+            try{
+                connection.setAutoCommit(false); //set autocommit to false
+                statement.executeUpdate(String.format("UPDATE BOOKS SET ISBN='%s', edition ='%s' WHERE pid = '%s' ", ISBN, edition, pid));
+                connection.commit(); //if there is no error commit the transaction
+                System.out.println( "\nTransaction Success!!" ); //print success message
+            }
+            catch (SQLException sqlE){
+                //If error is found, the transaction is rolled back and the table is returned to its previous state
+                System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
+                System.out.println( sqlE ); //print our error message
+                connection.rollback(); //rollback the transaction
+                connection.setAutoCommit(true); //set autocommit to true
+            }
+
+        }
+        //catches any errors that may occur and quits
+        catch (Exception e)
+        {
+            System.out.println( "There was an error: " + e.getMessage() );
+        }
+    }
+
+
+
+
+    public static void updateBookInfo(){
+        //Asks user to enter new information about Book
+        try{
+            String pid, ISBN, edition;
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Please enter publication ID:");
+            pid= br.readLine();
             System.out.println("Please enter the ISBN of the book you want to update:");
             ISBN = br.readLine();
             System.out.println("Please enter the new edition of the Book:");
@@ -131,7 +247,7 @@ public class WolfPubInit {
 
             try{
                 connection.setAutoCommit(false); //set autocommit to false
-                statement.executeUpdate(String.format("UPDATE BOOKS SET ISBN='%s', edition ='%s' ", ISBN, edition));
+                statement.executeUpdate(String.format("UPDATE BOOKS SET ISBN='%s', edition ='%s' WHERE pid = '%s' ", ISBN, edition, pid));
                 connection.commit(); //if there is no error commit the transaction
                 System.out.println( "\nTransaction Success!!" ); //print success message
             }
