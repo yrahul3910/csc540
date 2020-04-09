@@ -71,25 +71,28 @@ VALUES (3004, 1100, "2020-04-01");
 INSERT INTO Payments (sid, paycheck, paydate)
 VALUES (3005, 1000, "2020-04-01");
 
+-- price deleted from Publications
 CREATE TABLE Publications (
 pid INT AUTO_INCREMENT PRIMARY KEY,
 ptype VARCHAR(30) NOT NULL,
 title VARCHAR(250) NOT NULL,
 editor VARCHAR(250),
+topics VARCHAR(200),
 dop DATE,
-url VARCHAR(2048),
-price FLOAT
+url VARCHAR(2048)
 ) AUTO_INCREMENT = 1001;
 
 -- Publications --
-INSERT INTO Publications (ptype, title, editor, dop)
-VALUES ('book', 'introduction to database', 'John', '2018-10-10');
-INSERT INTO Publications (ptype, title, editor, dop)
-VALUES ('magazine', 'Healthy Diet', 'Ethen','2020-02-24');
-INSERT INTO Publications (ptype, title, editor, dop)
-VALUES ('journal', 'Animal Science', '/','2020-03-01');
-INSERT INTO Publications (ptype, title, editor, dop, url)
-VALUES ('book', 'Food for Today', 'John', '2019-08-02', 'https://bit.ly/2xhTC1e');
+INSERT INTO Publications (ptype, title, editor, topics, dop)
+VALUES ('book', 'introduction to database', 'John', 'technology', '2018-10-10');
+INSERT INTO Publications (ptype, title, editor, topics, dop)
+VALUES ('magazine', 'Healthy Diet', 'Ethen', 'health', '2020-02-24');
+INSERT INTO Publications (ptype, title, editor, topics, dop)
+VALUES ('journal', 'Animal Science', '/', 'science', '2020-03-01');
+INSERT INTO Publications (ptype, title, editor, topics, dop, url)
+VALUES ('book', 'Food for Today', 'John', 'health', '2019-08-02', 'https://bit.ly/2xhTC1e');
+INSERT INTO Publications(ptype, title, editor, topics, dop, url) 
+VALUES ('magazine', 'Birds and Blooms', 'Ethen', 'nature', '2019-07-20', 'https://bit.ly/2vIN7o4');
 
 
 CREATE TABLE Books(
@@ -123,7 +126,7 @@ VALUES (1001, 4, 'Query Execution', 'Query-execution process', 'https://bit.ly/3
 
 CREATE TABLE PeriodicPublication (
 pid INT NOT NULL,
-periodicity INT NOT NULL,
+periodicity VARCHAR(50) NOT NULL,
 pptype VARCHAR(30) NOT NULL,
 pptext LONGTEXT,
 doi DATE,
@@ -132,9 +135,11 @@ ON UPDATE CASCADE
 );
 
 INSERT INTO PeriodicPublication(pid, periodicity, pptype, pptext, doi) 
-VALUES (1002, 1, 'magazine', 'ABC', '2020-02-24');
+VALUES (1002, 'monthly', 'magazine', 'ABC', '2020-02-24');
 INSERT INTO PeriodicPublication(pid, periodicity, pptype, pptext, doi) 
-VALUES (1003, 1, 'journal', 'AAA', '2020-03-01');
+VALUES (1003, 'monthly', 'journal', 'AAA', '2020-03-01');
+INSERT INTO PeriodicPublication(pid, periodicity, pptype, pptext, doi) 
+VALUES (1005, 'weekly', 'magazine', 'Birds', '2020-01-07');
 
 CREATE TABLE Issue(
 pid INT NOT NULL,
@@ -148,6 +153,9 @@ INSERT INTO Issue (pid, ino)
 VALUES (1002, 1);
 INSERT INTO Issue (pid, ino)
 VALUES (1003, 3);
+INSERT INTO Issue (pid, ino)
+VALUES (1005, 1);
+
 
 CREATE TABLE Articles(
 aid INT AUTO_INCREMENT PRIMARY KEY,
@@ -163,15 +171,6 @@ INSERT INTO Articles(atitle, doc, atext, url)
 VALUES('Miami Underwater', '2019-12-14', 'Miami Beach', 'https://bit.ly/3dmeZiS');
 INSERT INTO Articles(atitle, doc, atext, url) 
 VALUES('Vanishing Act', '2018-12-27', 'Vanishing Act', 'https://bit.ly/3a8LLBH');
-
-
-CREATE TABLE Topics(
-topic VARCHAR(50) PRIMARY KEY
-);
-
-INSERT INTO Topics (topic) VALUES ('technology');
-INSERT INTO Topics (topic) VALUES ('health');
-INSERT INTO Topics (topic) VALUES ('science');
 
 
 CREATE TABLE Distributors(
@@ -191,6 +190,8 @@ INSERT INTO Distributors (dname, dtype, address, city, phno, contact, tot_balanc
 VALUES ('BookDist', 'wholesaler', '2200, B Street, NC', 'Raleigh', 9291234567, 'Alex', 0);
 INSERT INTO Distributors (dname, dtype, address, city, phno, contact, tot_balance) 
 VALUES ('Robinson', 'library', '1315 Oakwood Ave, NC', 'Raleigh', 9842314572, 'Andrew', 0);
+INSERT INTO Distributors (dname, dtype, address, city, phno, contact, tot_balance) 
+VALUES ('The Book Barn', 'bookstore', '410 Delaware St', 'Leavenworth', 9136826518, 'Charles', 0);
 
 
 CREATE TABLE Orders(
@@ -208,6 +209,8 @@ INSERT INTO Orders (copies, odate, deldate, price, shcost)
 VALUES (10, '2020-02-05', '2020-02-15', 20, 15);
 INSERT INTO Orders (copies, odate, deldate, price, shcost)
 VALUES (10, '2020-02-10', '2020-02-25', 10, 15);
+INSERT INTO Orders (copies, odate, deldate, price, shcost)
+VALUES (40, '2020-02-20', '2020-03-10', 17, 20);
 
 
 CREATE TABLE ConsistOf(
@@ -223,6 +226,8 @@ INSERT INTO ConsistOf(oid, pid)
 VALUES (4002, 1001);
 INSERT INTO ConsistOf(oid, pid)
 VALUES (4003, 1003);
+INSERT INTO ConsistOf(oid, pid)
+VALUES (4004, 1005);
 
 CREATE TABLE MakeOrder(
 did INT NOT NULL,
@@ -237,6 +242,8 @@ INSERT INTO MakeOrder(did, oid)
 VALUES (2001, 4002);
 INSERT INTO MakeOrder(did, oid)
 VALUES (2002, 4003);
+INSERT INTO MakeOrder(did, oid)
+VALUES (2003, 4004);
 
 
 CREATE TABLE ContainArticle(
@@ -250,6 +257,8 @@ INSERT INTO ContainArticle(pid, aid)
 VALUES (1002, 5001);
 INSERT INTO ContainArticle(pid, aid)
 VALUES (1003, 5003);
+INSERT INTO ContainArticle(pid, aid)
+VALUES (1005, 5002);
 
 
 CREATE TABLE Edit(
@@ -264,21 +273,10 @@ INSERT INTO Edit (pid, sid)
 VALUES (1001, 3001);
 INSERT INTO Edit (pid, sid)
 VALUES (1002, 3002);
-
-
-CREATE TABLE HasTopic(
-pid INT NOT NULL,
-topic VARCHAR(50),
-FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE,
-FOREIGN KEY(topic) REFERENCES Topics(topic) ON UPDATE CASCADE
-);
-
-INSERT INTO HasTopic(pid, topic)
-VALUES (1001, 'technology');
-INSERT INTO HasTopic(pid, topic)
-VALUES (1002, 'health');
-INSERT INTO HasTopic(pid, topic)
-VALUES (1003, 'science');
+INSERT INTO Edit (pid, sid)
+VALUES (1004, 3001);
+INSERT INTO Edit (pid, sid)
+VALUES (1005, 3002);
 
 
 CREATE TABLE WriteArticle(
@@ -308,3 +306,27 @@ INSERT INTO WriteBook (pid, sid)
 VALUES (1001, 3003);
 INSERT INTO WriteBook (pid, sid)
 VALUES (1004, 3005);
+
+/**
+CREATE TABLE Topics(
+topic VARCHAR(50) PRIMARY KEY
+);
+
+INSERT INTO Topics (topic) VALUES ('technology');
+INSERT INTO Topics (topic) VALUES ('health');
+INSERT INTO Topics (topic) VALUES ('science');
+
+CREATE TABLE HasTopic(
+pid INT NOT NULL,
+topic VARCHAR(50),
+FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE,
+FOREIGN KEY(topic) REFERENCES Topics(topic) ON UPDATE CASCADE
+);
+
+INSERT INTO HasTopic(pid, topic)
+VALUES (1001, 'technology');
+INSERT INTO HasTopic(pid, topic)
+VALUES (1002, 'health');
+INSERT INTO HasTopic(pid, topic)
+VALUES (1003, 'science');
+**/

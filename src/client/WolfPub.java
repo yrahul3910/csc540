@@ -17,6 +17,8 @@ public class WolfPubInit {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Please enter the title of the publication:");
             title = br.readLine();
+<<<<<<< HEAD
+=======
             System.out.println("Please enter the name of editor: ");
             editor = br.readLine();
             System.out.println("Please enter topic of the publication: ");
@@ -147,12 +149,12 @@ public class WolfPubInit {
             System.out.println("Please enter edition of the Book: ");
             edition = br.readLine();
             System.out.println("Edition entered: " + edition);
+>>>>>>> 07f8181f0474d3cde72badc62faba69b00a34903
 
         }
         catch (Exception e) {
             System.out.println("There is an error: " + e.getMessage());
         }
-
 
     }
 
@@ -176,13 +178,13 @@ public class WolfPubInit {
                 statement.executeUpdate("INSERT INTO Books(ISBN, edition) "+
                         "VALUES ( " +"'" + ISBN + "' ,'"+ edition + "'" + ");"); //inserts a row in the Book's table with the appropriate values
                 connection.commit(); //commit the transaction if there is no error
-                System.out.println( "\nTransaction Success!!" ); //print error message
+                System.out.println( "\nTransaction Success!" ); //print error message
             }
 
             catch (SQLException sqlE){
                 //If error is found, the transaction is rolled back and the table is returned to its previous state
                 System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
-                System.out.println( sqlE ); //print our error message
+                System.out.println( sqlE ); //print the error message
                 connection.rollback(); //rollback the transaction
                 connection.setAutoCommit(true); //set the autocommit to true
             }
@@ -249,12 +251,12 @@ public class WolfPubInit {
                 connection.setAutoCommit(false); //set autocommit to false
                 statement.executeUpdate(String.format("UPDATE BOOKS SET ISBN='%s', edition ='%s' WHERE pid = '%s' ", ISBN, edition, pid));
                 connection.commit(); //if there is no error commit the transaction
-                System.out.println( "\nTransaction Success!!" ); //print success message
+                System.out.println( "\nTransaction Success!" ); //print success message
             }
             catch (SQLException sqlE){
                 //If error is found, the transaction is rolled back and the table is returned to its previous state
                 System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
-                System.out.println( sqlE ); //print our error message
+                System.out.println( sqlE ); //print the error message
                 connection.rollback(); //rollback the transaction
                 connection.setAutoCommit(true); //set autocommit to true
             }
@@ -268,6 +270,10 @@ public class WolfPubInit {
     }
 
 
+    /**
+     *
+     *
+     */
     public static void enterDistributorInfo(){
         //Insert new tuples into Distributors table
         try{
@@ -275,25 +281,18 @@ public class WolfPubInit {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Please enter the distributor's name:");
             dname = br.readLine();
-            System.out.println("Distributor's name entered: " + dname);
             System.out.println("Please enter the distributor's type (wholesale/bookstore/library):");
             dtype = br.readLine();
-            System.out.println("Distributor's type entered: " + dtype);
             System.out.println("Please enter the distributor's city:");
             city = br.readLine();
-            System.out.println("Distributor's city entered: " + city);
             System.out.println("Please enter the distributor's address:");
             address = br.readLine();
-            System.out.println("Distributor's address entered: " + address);
             System.out.println("Please enter the distributor's contact (full name):");
             contact = br.readLine();
-            System.out.println("Distributor's contact entered: " + contact);
             System.out.println("Please enter the distributor's phone number (111-111-1111):");
             phno = br.readLine();
-            System.out.println("Distributor's phone number entered: " + phno);
             System.out.println("Please enter the distributor's total balance:");
             tot_balance = br.readLine();
-            System.out.println("Distributor's total balance entered: " + tot_balance);
 
             try{
                 connection.setAutoCommit(false); //set autocommit to false
@@ -327,25 +326,18 @@ public class WolfPubInit {
 
             System.out.println("Please enter the new distributor's name:");
             dname = br.readLine();
-            System.out.println("Distributor's name entered: " + dname);
             System.out.println("Please enter the new type of the distributor (wholesale/bookstore/library):");
             dtype = br.readLine();
-            System.out.println("Distributor's type entered: " + dtype);
             System.out.println("Please enter the new city of the distributor:");
             city = br.readLine();
-            System.out.println("Distributor's city entered: " + city);
             System.out.println("Please enter the new address of the distributor:");
             address = br.readLine();
-            System.out.println("Distributor's address entered: " + address);
             System.out.println("Please enter the new contact of the distributor (full name):");
             contact = br.readLine();
-            System.out.println("Distributor's contact entered: " + contact);
             System.out.println("Please enter the distributor's new phone number (111-111-1111):");
             phno = br.readLine();
-            System.out.println("Distributor's phone number entered: " + phno);
             System.out.println("Please enter the distributor's total balance:");
             tot_balance = br.readLine();
-            System.out.println("Distributor's total balance entered: " + tot_balance);
 
             try{
                 connection.setAutoCommit(false); //set autocommit to false
