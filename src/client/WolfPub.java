@@ -1,17 +1,24 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 
 
 public class WolfPubInit {
+    /**
+     * Helper functions
+     */
+    private boolean topicExists(String topic) {
+        
+    }
+}
+
 
     /**
      *Entering new publication (book, magazine or journal)
      */
-
-
     public static void enterPublicationInfo(){
         //Inserts new tuples into the Publications table
         try{
@@ -571,7 +578,7 @@ public class WolfPubInit {
 
 
 
-    public static void main(String[] args) {
+    public static void mainsd(String[] args) {
         int action = -1;
         int staffAction = -1;
         //Initializes the entire database. Creates the appropriate tables, sequences, inserts, etc...
@@ -657,7 +664,9 @@ public class WolfPubInit {
     }
 
 
-
-
+        /**
+         * Report generation
+         */
+    
 
 }
