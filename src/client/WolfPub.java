@@ -1,44 +1,85 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.PreparedStatement;
+import java.sql.*;
 
 
-public class WolfPubInit {
+public class WolfPub {
+    private Connection con;
+
+    public WolfPub(String url, String username, String password) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            try {
+                this.con = DriverManager.getConnection(url, username, password);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
     /**
      * Helper functions
      */
-    private boolean topicExists(String topic) {
-        
+    private void runStatement(String query) {
+        try {
+            Statement stmt = this.con.createStatement();
+
+            ResultSet rs = stmt.executeQuery(query);
+            PrintCursor printer = new PrintCursor(rs);
+            printer.print();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
-}
+
+    private void runPreparedStatement(String query, String... rest) {
+        try {
+            PreparedStatement stmt = this.con.prepareStatement(query);
+
+            int counter = 1;
+            for (String arg : rest) {
+                stmt.setString(counter, arg);
+                counter++;
+            }
+
+            ResultSet rs = stmt.executeQuery();
+            PrintCursor printer = new PrintCursor(rs);
+            printer.print();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
 
 
     /**
-     *Entering new publication (book, magazine or journal)
+     * Entering new publication (book, magazine or journal)
      */
-    public static void enterPublicationInfo(){
+    public static void enterPublicationInfo() {
         //Inserts new tuples into the Publications table
-        try{
-            String title, editor, topic, edition, ISBN number,
-                    dop, doi, ptext,  url, price;
-            try{
-            String title, editor, topics, edition, ISBN number, periodicity,
-                    dop, doc, doi, pptext, atext, url, price;
-            int ptype;
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Please enter the title of the publication:");
-            title = br.readLine();
+        try {
+            String title, editor, topic, edition, ISBN, number,
+                    dop, doi, ptext, url, price;
+            try {
+                String title, editor, topics, edition, ISBN number, periodicity,
+                        dop, doc, doi, pptext, atext, url, price;
+                int ptype;
+                BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+                System.out.println("Please enter the title of the publication:");
+                title = br.readLine();
 
-            System.out.println("Please choose type of publication: " +
-                    "\n1. Book\n" +
-                    "\n2. Magazine\n" +
-                    "\n3. Journal\n" +
-                    "\n4. Article\n");
-            ptype = br.readLine();
-                if(ptype = 1){
+                System.out.println("Please choose type of publication: " +
+                        "\n1. Book\n" +
+                        "\n2. Magazine\n" +
+                        "\n3. Journal\n" +
+                        "\n4. Article\n");
+
+                ptype = br.readLine();
+                if (ptype = 1) {
                     System.out.println("Please enter the name of editor: "); //maybe we add here command "press "/" if you don't
                     editor = br.readLine();                                                        // editor's name"??
                     System.out.println("Please enter topic of the publication: ");  // the same with topic cause we allow NULLs there
@@ -57,24 +98,23 @@ public class WolfPubInit {
                     System.out.println("Please enter price: ");
                     price = br.readLine();
 
-                    try{
+                    try {
                         connection.setAutoCommit(false); //set autocommit false
                         statement.executeUpdate("INSERT INTO Publications(title, ptype, topics, editor, dop, url" +
-                                "price) "+
-                                "VALUES (" +"'" + title + "' ,book, '" + topics + "','"
-                                + editor + "'," + dop + ", '" + url + "', '" + price +  ")"); //insert new publication into Publications
+                                "price) " +
+                                "VALUES (" + "'" + title + "' ,book, '" + topics + "','"
+                                + editor + "'," + dop + ", '" + url + "', '" + price + ")"); //insert new publication into Publications
                         statement.executeUpdate("INSERT INTO BOOKS(pid, ISBN, edition)" +
-                                "VALUES (" + "(SELECT pid FROM Publications WHERE title = '"  + title + "'" + "AND ptype = book )"
+                                "VALUES (" + "(SELECT pid FROM Publications WHERE title = '" + title + "'" + "AND ptype = book )"
                                 + ", '" + ISBN + "', '" + edition + "'" + ")"); // Inserting new book into BOOKS.
-                                                                                //should we do two seperate transactions for fetching pid?
+                        //should we do two seperate transactions for fetching pid?
                         connection.commit(); //commits the transaction to the database if no error has been detected
-                        System.out.println( "\nTransaction Success!!" );
-                    }
-                    catch (SQLException sqlE) // the SQL was malformed
+                        System.out.println("\nTransaction Success!!");
+                    } catch (SQLException sqlE) // the SQL was malformed
                     {
                         //If error is found, the transaction is rolled back and the table is returned to its previous state
-                        System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
-                        System.out.println( sqlE.getMessage() ); // print SQL error message
+                        System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                        System.out.println(sqlE.getMessage()); // print SQL error message
                         connection.rollback(); //rollback transaction
                         connection.setAutoCommit(true); //reset autocommit to true
                     }
@@ -106,27 +146,25 @@ public class WolfPubInit {
                         connection.setAutoCommit(false);
 
                         statement.executeUpdate("INSERT INTO Publications(title, ptype, topics, editor, dop, url" +
-                                "price) "+
-                                "VALUES (" +"'" + title + "' ,magazine, '" + topics + "','"
-                                + editor + "'," + dop + ", '" + url + "', '" + price +  ")");
+                                "price) " +
+                                "VALUES (" + "'" + title + "' ,magazine, '" + topics + "','"
+                                + editor + "'," + dop + ", '" + url + "', '" + price + ")");
                         statement.executeUpdate("INSERT INTO PeriodicPublication(pid, periodicity, ptype, pptext, doi)" +
-                                "VALUES (" + "(SELECT pid FROM Publications WHERE title = '"  + title + "'" + "AND ptype = book )"
+                                "VALUES (" + "(SELECT pid FROM Publications WHERE title = '" + title + "'" + "AND ptype = book )"
                                 + ", '" + periodicity + "', '" + ptype + "', '" + pptext + "', '" + doi + "'" + ")");
                         connection.commit(); //commits the transaction to the database if no error has been detected
-                        System.out.println( "\nTransaction Success!!" );
-                    }
-                    catch (SQLException sqlE) // the SQL was malformed
+                        System.out.println("\nTransaction Success!!");
+                    } catch (SQLException sqlE) // the SQL was malformed
                     {
                         //If error is found, the transaction is rolled back and the table is returned to its previous state
-                        System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
-                        System.out.println( sqlE.getMessage() ); // print SQL error message
+                        System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                        System.out.println(sqlE.getMessage()); // print SQL error message
                         connection.rollback(); //rollback transaction
                         connection.setAutoCommit(true); //reset autocommit to true
                     }
 
 
-                }
-                else if (ptype = 3) {
+                } else if (ptype = 3) {
                     System.out.println("Please enter the name of editor: "); //maybe we add here command "press "/" if you don't
                     editor = br.readLine();                                                        // editor's name"??
                     System.out.println("Please enter topic of the publication: ");  // the same with topic cause we allow NULLs there
@@ -148,26 +186,24 @@ public class WolfPubInit {
                         connection.setAutoCommit(false);
 
                         statement.executeUpdate("INSERT INTO Publications(title, ptype, topics, editor, dop, url" +
-                                "price) "+
-                                "VALUES (" +"'" + title + "' ,journal, '" + topics + "','"
-                                + editor + "'," + dop + ", '" + url + "', '" + price +  ")");
+                                "price) " +
+                                "VALUES (" + "'" + title + "' ,journal, '" + topics + "','"
+                                + editor + "'," + dop + ", '" + url + "', '" + price + ")");
                         statement.executeUpdate("INSERT INTO PeriodicPublication(pid, periodicity, ptype, pptext, doi)" +
-                                "VALUES (" + "(SELECT pid FROM Publications WHERE title = '"  + title + "'" + "AND ptype = book )"
+                                "VALUES (" + "(SELECT pid FROM Publications WHERE title = '" + title + "'" + "AND ptype = book )"
                                 + ", '" + periodicity + "', '" + ptype + "', '" + pptext + "', '" + doi + "'" + ")");
                         connection.commit(); //commits the transaction to the database if no error has been detected
-                        System.out.println( "\nTransaction Success!!" );
-                    }
-                    catch (SQLException sqlE) // the SQL was malformed
+                        System.out.println("\nTransaction Success!!");
+                    } catch (SQLException sqlE) // the SQL was malformed
                     {
                         //If error is found, the transaction is rolled back and the table is returned to its previous state
-                        System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
-                        System.out.println( sqlE.getMessage() ); // print SQL error message
+                        System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                        System.out.println(sqlE.getMessage()); // print SQL error message
                         connection.rollback(); //rollback transaction
                         connection.setAutoCommit(true); //reset autocommit to true
                     }
 
-                }
-                else if (ptype = 4){
+                } else if (ptype = 4) {
                     System.out.println("Please enter date of creation of the article: "); // or press "/" if you don't know?
                     doc = br.readLine();
                     System.out.println("Please enter text of the article: ");
@@ -177,34 +213,32 @@ public class WolfPubInit {
                     try {
                         connection.setAutoCommit(false);
 
-                        statement.executeUpdate("INSERT INTO Articles(atitle, doc, atext, url)"+
-                                "VALUES (" +"'" + title + "', '" + doc + "', '"
-                                + atext + "', '"  + url + "')");
+                        statement.executeUpdate("INSERT INTO Articles(atitle, doc, atext, url)" +
+                                "VALUES (" + "'" + title + "', '" + doc + "', '"
+                                + atext + "', '" + url + "')");
                         connection.commit(); //commits the transaction to the database if no error has been detected
-                        System.out.println( "\nTransaction Success!!" );
-                    }
-                    catch (SQLException sqlE) // the SQL was malformed
+                        System.out.println("\nTransaction Success!!");
+                    } catch (SQLException sqlE) // the SQL was malformed
                     {
                         //If error is found, the transaction is rolled back and the table is returned to its previous state
-                        System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
-                        System.out.println( sqlE.getMessage() ); // print SQL error message
+                        System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                        System.out.println(sqlE.getMessage()); // print SQL error message
                         connection.rollback(); //rollback transaction
                         connection.setAutoCommit(true); //reset autocommit to true
                     }
                 }
 
 
+            } catch (Exception e) {
+                System.out.println("There is an error: " + e.getMessage());
+            }
         }
-        catch (Exception e) {
-            System.out.println("There is an error: " + e.getMessage());
-        }
-
     }
 
 
-    public static void enterBookInfo(){
+    public static void enterBookInfo() {
         //Inserts new rows into the Customers table based on what the user inputs
-        try{
+        try {
             //Stores the values in the appropriate variables
             String ISBN, edition;
 
@@ -214,37 +248,34 @@ public class WolfPubInit {
             System.out.println("Please enter edition of the Book: ");
             edition = br.readLine();
 
-            try{
+            try {
                 connection.setAutoCommit(false); //set autocommit to false
-                statement.executeUpdate("INSERT INTO Books(ISBN, edition) "+
-                        "VALUES ( " +"'" + ISBN + "', '"+ edition + "'" + ");"); //inserts a row in the Book's table with the appropriate values
+                statement.executeUpdate("INSERT INTO Books(ISBN, edition) " +
+                        "VALUES ( " + "'" + ISBN + "', '" + edition + "'" + ");"); //inserts a row in the Book's table with the appropriate values
                 connection.commit(); //commit the transaction if there is no error
-                System.out.println( "\nTransaction Success!" ); //print error message
-            }
-
-            catch (SQLException sqlE){
+                System.out.println("\nTransaction Success!"); //print error message
+            } catch (SQLException sqlE) {
                 //If error is found, the transaction is rolled back and the table is returned to its previous state
-                System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
-                System.out.println( sqlE ); //print the error message
+                System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                System.out.println(sqlE); //print the error message
                 connection.rollback(); //rollback the transaction
                 connection.setAutoCommit(true); //set the autocommit to true
             }
 
         }
         //catches any errors that may occur and quits
-        catch (Exception e)
-        {
-            System.out.println( "There was an error: " + e.getMessage() );
+        catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
         }
     }
 
-    public static void updatePublicationInfo(){
+    public static void updatePublicationInfo() {
         //Asks user to enter new information about Publication
-        try{
+        try {
             String pid, ISBN, edition;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Please enter publication ID:");
-            pid= br.readLine();
+            pid = br.readLine();
             System.out.println("Please choose type of publication: " +
                     "\n1. Book\n" +
                     "\n2. Magazine\n" +
@@ -252,7 +283,7 @@ public class WolfPubInit {
                     "\n4. Article\n");
             ptype = br.readLine();
 
-            if(ptype = 1) {
+            if (ptype = 1) {
                 System.out.println("Please enter new name of editor: "); //maybe we add here command "press "/" if you don't
                 editor = br.readLine();                                                        // editor's name"??
                 System.out.println("Please enter new topic of the publication: ");  // the same with topic cause we allow NULLs there
@@ -291,47 +322,42 @@ public class WolfPubInit {
 
         }
         //catches any errors that may occur and quits
-        catch (Exception e)
-        {
-            System.out.println( "There was an error: " + e.getMessage() );
+        catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
         }
     }
 
 
-
-
-    public static void updateBookInfo(){
+    public static void updateBookInfo() {
         //Asks user to enter new information about Book
-        try{
+        try {
             String pid, ISBN, edition;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Please enter the ISBN of the book you want to update: ");
             System.out.println("Please enter publication ID:");
-            pid= br.readLine();
+            pid = br.readLine();
             System.out.println("Please enter the ISBN of the book you want to update:");
             ISBN = br.readLine();
             System.out.println("Please enter the new edition of the Book: ");
             edition = br.readLine();
 
-            try{
+            try {
                 connection.setAutoCommit(false); //set autocommit to false
                 statement.executeUpdate(String.format("UPDATE BOOKS SET ISBN='%s', edition ='%s' WHERE pid = '%s' ", ISBN, edition, pid));
                 connection.commit(); //if there is no error commit the transaction
-                System.out.println( "\nTransaction Success!" ); //print success message
-            }
-            catch (SQLException sqlE){
+                System.out.println("\nTransaction Success!"); //print success message
+            } catch (SQLException sqlE) {
                 //If error is found, the transaction is rolled back and the table is returned to its previous state
-                System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
-                System.out.println( sqlE ); //print the error message
+                System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                System.out.println(sqlE); //print the error message
                 connection.rollback(); //rollback the transaction
                 connection.setAutoCommit(true); //set autocommit to true
             }
 
         }
         //catches any errors that may occur and quits
-        catch (Exception e)
-        {
-            System.out.println( "There was an error: " + e.getMessage() );
+        catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
         }
     }
 
@@ -347,8 +373,7 @@ public class WolfPubInit {
             result = statement.executeQuery("SELECT title, ISBN, edition FROM Books NATURAL JOIN Publications " +
                     "NATURAL JOIN Staff NATURAL JOIN WriteBook WHERE sname = '" + sname + "'");
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -366,8 +391,7 @@ public class WolfPubInit {
             result = statement.executeQuery("SELECT title, edition, ISBN FROM Books NATURAL JOIN Publications " +
                     "WHERE dop = '" + dop + "'");
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -384,8 +408,7 @@ public class WolfPubInit {
             result = statement.executeQuery("SELECT title, edition, ISBN FROM Books NATURAL JOIN Publications " +
                     "WHERE topics LIKE '%" + topics + "%'");
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -403,8 +426,7 @@ public class WolfPubInit {
             result = statement.executeQuery("SELECT atitle, atext FROM Articles NATURAL JOIN Staff " +
                     "NATURAL JOIN WriteArticle WHERE sname = '" + sname + "'");
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -421,8 +443,7 @@ public class WolfPubInit {
             dop = br.readLine();
             result = statement.executeQuery("SELECT atitle, atext FROM Articles NATURAL JOIN ContainArticle " +
                     "NATURAL JOIN (SELECT pid, dop FROM Publications) as Publication WHERE dop = '" + dop + "'");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -438,16 +459,13 @@ public class WolfPubInit {
             atopics = br.readLine();
             result = statement.executeQuery("SELECT atitle, atext" +
                     "FROM Articles WHERE atopics LIKE '%" + atopics + "%';");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 
-
-
-    public static void enterEmployeePayment(){
+    public static void enterEmployeePayment() {
         try {
             int sid;
             String paycheck, paydate;
@@ -464,17 +482,15 @@ public class WolfPubInit {
                 statement.executeUpdate("INSERT INTO Payments (sid, paycheck, paydate)" +
                         "VALUES (" + "'" + sid + "', '" + paycheck + "', '" + paydate + "');");
                 connection.commit(); //commit the transaction if there is no error
-                System.out.println( "\nTransaction Success!" );
-            }
-            catch {
-                System.out.print( "An error occurred: " );
+                System.out.println("\nTransaction Success!");
+            } catch {
+                System.out.print("An error occurred: ");
                 System.out.println(sqlE); //print the error message
                 connection.rollback(); //rollback the transaction
                 connection.setAutoCommit(true); //set autocommit to true
             }
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());
         }
 
@@ -484,11 +500,10 @@ public class WolfPubInit {
 
     /**
      *
-     *
      */
-    public static void enterDistributorInfo(){
+    public static void enterDistributorInfo() {
         //Insert new tuples into Distributors table
-        try{
+        try {
             String dname, dtype, city, address, contact, phno, tot_balance;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Please enter the distributor's name:");
@@ -506,31 +521,29 @@ public class WolfPubInit {
             System.out.println("Please enter the distributor's total balance:");
             tot_balance = br.readLine();
 
-            try{
+            try {
                 connection.setAutoCommit(false); //set autocommit to false
-                statement.executeUpdate("INSERT INTO Distributors(dname, dtype, city, address, contact, phno, tot_balance) "+
-                        "VALUES (" + "'" + dname + "' ,'"+ dtype +  "', '" + city + "', "
-                        + address + ", '"  + contact + "', '" + phno + "', " + tot_balance + "');"); //insert a tuple into the distributors' table
+                statement.executeUpdate("INSERT INTO Distributors(dname, dtype, city, address, contact, phno, tot_balance) " +
+                        "VALUES (" + "'" + dname + "' ,'" + dtype + "', '" + city + "', "
+                        + address + ", '" + contact + "', '" + phno + "', " + tot_balance + "');"); //insert a tuple into the distributors' table
                 connection.commit(); //commit the transaction if there is no error
-                System.out.println( "\nTransaction Success!" );
-            }
-            catch(SQLException sqlE){
-                System.out.print( "An error occurred: " );
+                System.out.println("\nTransaction Success!");
+            } catch (SQLException sqlE) {
+                System.out.print("An error occurred: ");
                 System.out.println(sqlE); //print the error message
                 connection.rollback(); //rollback the transaction
                 connection.setAutoCommit(true); //set autocommit to true
             }
 
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             System.out.println("There is an error: " + e.getMessage());
         }
 
 
     }
 
-    public static void updateDistributorInfo(){
-        try{
+    public static void updateDistributorInfo() {
+        try {
             String did, dname, dtype, city, address, contact, phno, tot_balance;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Please enter the distributor ID you want to update:");
@@ -551,31 +564,25 @@ public class WolfPubInit {
             System.out.println("Please enter the distributor's total balance:");
             tot_balance = br.readLine();
 
-            try{
+            try {
                 connection.setAutoCommit(false); //set autocommit to false
                 statement.executeUpdate(String.format("UPDATE Distributors SET dname='%s', dtype='%s', city='%s', address=%s, contact='%s', phno='%s', tot_balance=%s WHERE did=%s",
-                        + dname, dtype, city, address, contact, phno, tot_balance, did));
+                        +dname, dtype, city, address, contact, phno, tot_balance, did));
                 connection.commit(); //commit the transaction if there is no error
-                System.out.println( "\nTransaction Success!" ); //print success message
-            }
-            catch(SQLException sqlE){
+                System.out.println("\nTransaction Success!"); //print success message
+            } catch (SQLException sqlE) {
                 // If there is an error, the transaction is rolled back, so that the table is returned to the previous state
-                System.out.print( "An error occurred: " );
+                System.out.print("An error occurred: ");
                 System.out.println(sqlE); //print the error message
                 connection.rollback(); //rollback the transaction
                 connection.setAutoCommit(true); //set autocommit to true
             }
 
-        }
-
-        catch (Exception e)
-        {
-            System.out.println( "There is an error: " + e.getMessage() );
+        } catch (Exception e) {
+            System.out.println("There is an error: " + e.getMessage());
         }
 
     }
-
-
 
 
     public static void mainsd(String[] args) {
@@ -588,19 +595,19 @@ public class WolfPubInit {
         while (action != 9) {
             action = WolfPubMenu.loginMenu();
 
-            System.out.println("The choice is "+ action);
+            System.out.println("The choice is " + action);
             //if the manager is logged in, do the following:
             if (action == 1111) {
                 //Manager logged in
                 //While the Manager doesn't want to log out do the following
-                while (staffAction != 8){
+                while (staffAction != 8) {
                     staffAction = WolfPubMenu.menuManager();
                     //if action is 0 show all the books present
-                    if (staffAction == 0){
+                    if (staffAction == 0) {
                         showAllBooks();
                     }
                     //if action is 8 show all the staff
-                    else if(staffAction == 1){
+                    else if (staffAction == 1) {
                         showAllStaff();
                     }
 
@@ -612,45 +619,43 @@ public class WolfPubInit {
             else if (action == 2222) {
                 //Author/Editor logged in
                 //While the Author/Editor doesn't want to log out do the following
-                while (staffAction != 8){
+                while (staffAction != 8) {
                     staffAction = menu.menuAuthors();
                     //if action is 0 show all the books
-                    if (staffAction == 0){
+                    if (staffAction == 0) {
                         showAllBooks();
                     }
                     //if action is 1 show all the books by a given author
-                    else if (staffAction == 1){
+                    else if (staffAction == 1) {
                         findBooksByAuthor();
                     }
 
                 }
-            }
-            else if (action == 3333){
+            } else if (action == 3333) {
                 //Distributor logged in
                 //While the Distributor doesn't want to log out do the following
-                while (staffAction != 8){
+                while (staffAction != 8) {
                     staffAction = AplusSystemMenu.menuDistributor();
                     //if action is 0 show all the books
-                    if (staffAction == 0){
+                    if (staffAction == 0) {
                         showAllBooks();
                     }
 
                 }
-            }
-            else if (action == 4444){
+            } else if (action == 4444) {
                 // Billing staff logged in
                 //While the Billing Staff doesn't want to log out do the following
-                while (staffAction != 8){
+                while (staffAction != 8) {
                     staffAction = AplusSystemMenu.menuBilling();
                     //if action is 0 generate the billing for the customers
-                    if (staffAction == 0){
+                    if (staffAction == 0) {
                         generateBillingDistributors();
                     }
 
                 }
             }
             //if action is not 9 then let the user know they have not entered an acceptable ID
-            else if (action != 9){
+            else if (action != 9) {
                 System.out.println("You have entered incorrect ID please try again \n");
 
             } else if (action == -1) {
@@ -664,9 +669,12 @@ public class WolfPubInit {
     }
 
 
-        /**
-         * Report generation
-         */
-    
+    /**
+     * Report generation
+     */
+    public void getCopiesSoldByDistributor() {
+        Statement stmt = this.con.createStatement();
+
+    }
 
 }
