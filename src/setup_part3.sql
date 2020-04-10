@@ -2,7 +2,6 @@ DROP DATABASE IF EXISTS setup;
 CREATE DATABASE setup;
 USE setup;
 
-
 /**
 DROP TABLE IF EXISTS Staff CASCADE;
 DROP TABLE IF EXISTS Payments CASCADE;
@@ -83,16 +82,16 @@ url VARCHAR(2048)
 ) AUTO_INCREMENT = 1001;
 
 -- Publications --
-INSERT INTO Publications (ptype, title, editor, topics, dop)
-VALUES ('book', 'introduction to database', 'John', 'technology', '2018-10-10');
-INSERT INTO Publications (ptype, title, editor, topics, dop)
-VALUES ('magazine', 'Healthy Diet', 'Ethen', 'health', '2020-02-24');
-INSERT INTO Publications (ptype, title, editor, topics, dop)
-VALUES ('journal', 'Animal Science', '/', 'science', '2020-03-01');
-INSERT INTO Publications (ptype, title, editor, topics, dop, url)
-VALUES ('book', 'Food for Today', 'John', 'health', '2019-08-02', 'https://bit.ly/2xhTC1e');
-INSERT INTO Publications(ptype, title, editor, topics, dop, url) 
-VALUES ('magazine', 'Birds and Blooms', 'Ethen', 'nature', '2019-07-20', 'https://bit.ly/2vIN7o4');
+INSERT INTO Publications (ptype, title, editor, dop)
+VALUES ('book', 'introduction to database', 'John',  '2018-10-10');
+INSERT INTO Publications (ptype, title, editor, dop)
+VALUES ('magazine', 'Healthy Diet', 'Ethen',  '2020-02-24');
+INSERT INTO Publications (ptype, title, editor, dop)
+VALUES ('journal', 'Animal Science', '/', '2020-03-01');
+INSERT INTO Publications (ptype, title, editor, dop, url)
+VALUES ('book', 'Food for Today', 'John', '2019-08-02', 'https://bit.ly/2xhTC1e');
+INSERT INTO Publications(ptype, title, editor, dop, url) 
+VALUES ('magazine', 'Birds and Blooms', 'Ethen', '2019-07-20', 'https://bit.ly/2vIN7o4');
 
 
 CREATE TABLE Books(
@@ -168,12 +167,12 @@ url VARCHAR(2048)
 ) AUTO_INCREMENT = 5001;
 
 
-INSERT INTO Articles(atitle, atopics, doc, atext, url) 
-VALUES('Spatio-Temporal Database in Hospitals', 'database, health', '2018-09-02', 'Spatio-Temporal', 'https://bit.ly/3aRwIgq');
-INSERT INTO Articles(atitle, atopics, doc, atext, url) 
-VALUES('Miami Underwater', 'nature', '2019-12-14', 'Miami Beach', 'https://bit.ly/3dmeZiS');
-INSERT INTO Articles(atitle, atopics, doc, atext, url) 
-VALUES('Vanishing Act', 'science', '2018-12-27', 'Vanishing Act', 'https://bit.ly/3a8LLBH');
+INSERT INTO Articles(atitle, doc, atext, url) 
+VALUES('Spatio-Temporal Database in Hospitals', '2018-09-02', 'Spatio-Temporal', 'https://bit.ly/3aRwIgq');
+INSERT INTO Articles(atitle, doc, atext, url) 
+VALUES('Miami Underwater', '2019-12-14', 'Miami Beach', 'https://bit.ly/3dmeZiS');
+INSERT INTO Articles(atitle, doc, atext, url) 
+VALUES('Vanishing Act', '2018-12-27', 'Vanishing Act', 'https://bit.ly/3a8LLBH');
 
 
 CREATE TABLE Distributors(
@@ -313,7 +312,6 @@ INSERT INTO WriteBook (pid, sid)
 VALUES (1004, 3005);
 
 
-/**
 CREATE TABLE Topics(
 topic VARCHAR(50) PRIMARY KEY
 );
@@ -321,6 +319,7 @@ topic VARCHAR(50) PRIMARY KEY
 INSERT INTO Topics (topic) VALUES ('technology');
 INSERT INTO Topics (topic) VALUES ('health');
 INSERT INTO Topics (topic) VALUES ('science');
+INSERT INTO Topics (topic) VALUES ('nature');
 
 CREATE TABLE HasTopic(
 pid INT NOT NULL,
@@ -335,4 +334,9 @@ INSERT INTO HasTopic(pid, topic)
 VALUES (1002, 'health');
 INSERT INTO HasTopic(pid, topic)
 VALUES (1003, 'science');
-**/
+INSERT INTO HasTopic(pid, topic)
+VALUES (1004, 'health');
+INSERT INTO HasTopic(pid, topic)
+VALUES (1005, 'nature');
+
+
