@@ -58,6 +58,7 @@ public class WolfPub {
 
     /**
      * Entering new publication (book, magazine or journal)
+     *  This function inlcudes  TRANSACTIONS
      */
     public static void enterPublicationInfo(){
 
@@ -246,6 +247,150 @@ public class WolfPub {
             System.out.println("There is an error: " + e.getMessage());
         }
 
+    }
+
+    /**
+     * This method is used to update information of Publication (book, journal, magazine)
+     * To update publication just insert publication ID
+     * Current Information of publication will be shown
+     * Then type in updated information about publication
+     * Or just copy result for results you don't want to change
+     * This function includes TRANSACTIONS
+     */
+
+    public static void updatePublication() {
+
+        try {
+
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
+            String pid, title, editor, edition, ISBN, periodicity,
+                    dop, pptext, url, ptype;
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Please enter publication ID of the publication you want to update:");
+            pid = br.readLine();
+
+            //printReport(String.format("SELECT * FROM publications WHERE pid = '%s'", pid));
+            String stmt = "SELECT * FROM publications WHERE pid = ?" ;
+            PreparedStatement preparedSta = connection.prepareStatement(stmt);
+            preparedSta.setString(1, pid);
+
+            ResultSet rsp = preparedSta.executeQuery();
+            ResultSetMetaData md = rsp.getMetaData();
+            int colCount = md.getColumnCount();
+            rsp.next();
+            if (rsp.getString("ptype").equals("journal")||
+                    rsp.getString("ptype").equals("magazine")) {
+                String showPub = "SELECT * FROM publications NATURAL JOIN periodicpublication WHERE pid = ?";
+                PreparedStatement stat = connection.prepareStatement(showPub);
+                stat.setString(1, pid);
+                stat.executeQuery();
+
+                printResult(stat);
+                System.out.println("\nPlease enter new title of the publication:");
+                title = br.readLine();
+                System.out.println("Please enter new name of editor: ");
+                editor = br.readLine();                                                        // editor's name"??
+                System.out.println("Please enter new periodicity: ");
+                periodicity = br.readLine();
+                System.out.println("Please enter new text of magazine: "); //integer or string?
+                pptext = br.readLine();
+                System.out.println("Please enter new URL: ");
+                url = br.readLine();
+                try {
+                    connection.setAutoCommit(false);
+                    String pUp = "UPDATE publications SET ptype = ?, title = ?, editor = ?, url = ? WHERE pid = ?";
+                    PreparedStatement preparedStatement = connection.prepareStatement(pUp);
+                    preparedStatement.setString(1, "journal");
+                    preparedStatement.setString(2, title);
+                    preparedStatement.setString(3, editor);
+                    preparedStatement.setString(4, url);
+                    preparedStatement.setString(5, pid);
+                    preparedStatement.executeUpdate();
+
+                    String ppUp = "UPDATE periodicpublication SET periodicity = ?, pptype = ?, pptext = ?, WHERE pid = ?";
+                    PreparedStatement preparedStat = connection.prepareStatement(ppUp);
+                    preparedStat.setString(1, periodicity);
+                    preparedStat.setString(2, "magazine");
+                    preparedStat.setString(3, pptext);
+                    preparedStat.setString(4, pid);
+                    preparedStat.executeUpdate();
+
+
+                    connection.commit(); //commits the transaction to the database if no error has been detected
+                    System.out.println( "\nTransaction Success!!" );
+                }
+                catch (SQLException sqlE) // the SQL was malformed
+                {
+                    //If error is found, the transaction is rolled back and the table is returned to its previous state
+                    System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
+                    System.out.println( sqlE.getMessage() ); // print SQL error message
+                    connection.rollback(); //rollback transaction
+                    connection.setAutoCommit(true); //reset autocommit to true
+                }
+
+            }
+            if (rsp.getString("ptype").equals("book")) {
+                String showBook = "SELECT * FROM publications NATURAL JOIN Books WHERE pid = ?";
+                PreparedStatement stat = connection.prepareStatement(showBook);
+                stat.setString(1, pid);
+                stat.executeQuery();
+                printResult(stat);
+                System.out.println("\nPlease enter new title of the publication:");
+                title = br.readLine();
+                System.out.println("Please enter new name of editor: "); //maybe we add here command "press "/" if you don't
+                editor = br.readLine();                                                        // editor's name"??
+                System.out.println("Please enter ISBN number: "); //integer or string?
+                ISBN = br.readLine();
+                System.out.println("Please enter new edition: ");
+                edition = br.readLine();
+                System.out.println("Please enter new publication date: ");
+                dop = br.readLine();
+                System.out.println("Please enter new URL: ");
+                url = br.readLine();
+
+                try {
+                    connection.setAutoCommit(false);
+                    String Up = "UPDATE publications SET ptype = ?, title = ?, editor = ?, url = ? WHERE pid = ?";
+                    PreparedStatement preparedStatement = connection.prepareStatement(Up);
+                    preparedStatement.setString(1, "book");
+                    preparedStatement.setString(2, title);
+                    preparedStatement.setString(3, editor);
+                    preparedStatement.setString(4, url);
+                    preparedStatement.setString(5, pid);
+                    preparedStatement.executeUpdate();
+
+                    String bUp = "UPDATE books SET ISBN = ?, edition = ?, dop = ? WHERE pid = ?";
+                    PreparedStatement prepared = connection.prepareStatement(bUp);
+                    prepared.setString(1, ISBN);
+                    prepared.setString(2, edition);
+                    prepared.setString(3, dop);
+                    prepared.setString(4, pid);
+                    prepared.executeUpdate();
+
+
+                    connection.commit(); //commits the transaction to the database if no error has been detected
+                    System.out.println( "\nTransaction Success!!" );
+                }
+                catch (SQLException sqlE) // the SQL was malformed
+                {
+                    //If error is found, the transaction is rolled back and the table is returned to its previous state
+                    System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
+                    System.out.println( sqlE.getMessage() ); // print SQL error message
+                    connection.rollback(); //rollback transaction
+                    connection.setAutoCommit(true); //reset autocommit to true
+                }
+
+
+            }
+
+
+        }
+
+        catch (Exception e) {
+            System.out.println("There is an error: " + e.getMessage());
+        }
     }
 
 
