@@ -55,6 +55,24 @@ public class WolfPub {
         }
     }
 
+    /**
+     * Function for executing Prepared Statement and printing the results in clear manner
+     */
+    public static void printResult(PreparedStatement ps){
+        try {
+            ResultSet rs = ps.executeQuery();
+            ResultSetMetaData md = rs.getMetaData(); //getting metadata object
+            int colCount = md.getColumnCount(); //getting the number of columns in the result set
+            rs.next();
+            for (int i = 1; i <= colCount ; i++){ //iterating over columns
+                String col_name = md.getColumnName(i);
+                System.out.printf("%s : %s\n", col_name, rs.getString(col_name));
+            }
+        } catch (SQLException e) {
+            System.out.println("The system encountered an error: " + e.getMessage());
+        }
+    }
+
 
     /**
      * Entering new publication (book, magazine or journal)
@@ -519,35 +537,295 @@ public class WolfPub {
         }
     }
 
+
+
+    /**
+     * Enter new Issue of Periodic Publication
+     * This function includes TRANSACTION
+     */
+    public static void enterIssue() {
+        String pid, doi;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
+            System.out.println("Please enter Publication ID: ");
+            pid = br.readLine();
+            System.out.println("Please enter date of this issue: ");
+            doi = br.readLine();
+
+            try {
+                connection.setAutoCommit(false);
+                String issueIns = "INSERT INTO Issue (pid, doi) VALUES (?, ?);";
+
+                PreparedStatement preparedStatement = connection.prepareStatement(issueIns);
+                preparedStatement.setString(1, pid);
+                preparedStatement.setString(2, doi);
+                preparedStatement.executeUpdate();
+
+                connection.commit();
+                System.out.println("\nTransaction Success!");
+            } catch (SQLException sqlE) {
+                System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                System.out.println(sqlE.getMessage()); // print SQL error message
+                connection.rollback(); //rollback transaction
+                connection.setAutoCommit(true); //reset autocommit to true
+            }
+        } catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Update date of Issue of Periodic Publication
+     * This function includes TRANSACTION
+     */
+    public static void updateIssue() {
+        String pid, doi1, doi2;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
+            System.out.println("Please enter Publication ID: ");
+            pid = br.readLine();
+            System.out.println("Please enter date of issue you want to update: ");
+            doi1 = br.readLine();
+            System.out.println("Please enter new date of issue: ");
+            doi2 = br.readLine();
+
+            try {
+                connection.setAutoCommit(false);
+                String issueIns = "UPDATE Issue SET doi = ? WHERE pid = ? and doi = ?;";
+
+                PreparedStatement preparedStatement = connection.prepareStatement(issueIns);
+                preparedStatement.setString(1, doi2);
+                preparedStatement.setString(2, pid);
+                preparedStatement.setString(3, doi1);
+                preparedStatement.executeUpdate();
+
+                connection.commit();
+                System.out.println("\nTransaction Success!");
+            } catch (SQLException sqlE) {
+                System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                System.out.println(sqlE.getMessage()); // print SQL error message
+                connection.rollback(); //rollback transaction
+                connection.setAutoCommit(true); //reset autocommit to true
+            }
+        } catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * Delete particular Issue of Periodic Publication
+     * This function includes TRANSACTION
+     */
+    public static void deleteIssue() {
+        String pid, doi;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
+            System.out.println("Please enter Publication ID: ");
+            pid = br.readLine();
+            System.out.println("Please enter date of the issue you want to delete: ");
+            doi = br.readLine();
+
+            try {
+                connection.setAutoCommit(false);
+                String issueIns = "DELETE FROM Issue WHERE pid = ? and doi = ?;";
+
+                PreparedStatement preparedStatement = connection.prepareStatement(issueIns);
+                preparedStatement.setString(1, pid);
+                preparedStatement.setString(2, doi);
+                preparedStatement.executeUpdate();
+
+                connection.commit();
+                System.out.println("\nTransaction Success!");
+            } catch (SQLException sqlE) {
+                System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                System.out.println(sqlE.getMessage()); // print SQL error message
+                connection.rollback(); //rollback transaction
+                connection.setAutoCommit(true); //reset autocommit to true
+            }
+        } catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * Update Article's title
+     * This function includes TRANSACTION
+     */
+    public static void UpdateArticleTitle() {
+        String aid, atitle;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
+            System.out.println("Please enter Article ID: ");
+            aid = br.readLine();
+
+            String showArticles = "SELECT * FROM Articles WHERE aid = ?";
+            PreparedStatement ps = connection.prepareStatement(showArticles);
+            ps.setString(1, aid);
+            ps.executeQuery();
+            printResult(ps);
+
+            System.out.println("\nPlease enter new title of the article: ");
+            atitle = br.readLine();
+
+            try {
+                connection.setAutoCommit(false);
+                String articleUpd = "UPDATE Articles SET atitle = ? WHERE aid = ?;";
+
+                PreparedStatement preparedStatement = connection.prepareStatement(articleUpd);
+                preparedStatement.setString(1, atitle);
+                preparedStatement.setString(2, aid);
+                preparedStatement.executeUpdate();
+
+                connection.commit();
+                System.out.println("\nTransaction Success!");
+            } catch (SQLException sqlE) {
+                System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                System.out.println(sqlE.getMessage()); // print SQL error message
+                connection.rollback(); //rollback transaction
+                connection.setAutoCommit(true); //reset autocommit to true
+            }
+        } catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * Update Chapter's title
+     * This function includes TRANSACTION
+     */
+    public static void UpdateChapterTitle() {
+        String pid, chno, chtitle;
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
+            System.out.println("Please enter Publication ID where you want to update chapter's title: ");
+            pid = br.readLine();
+            System.out.println("Please enter chapter number you want to update: ");
+            chno = br.readLine();
+
+            String showChapter = "SELECT * FROM Chapters WHERE pid = ? and chno = ?";
+            PreparedStatement ps = connection.prepareStatement(showChapter);
+            ps.setString(1, pid);
+            ps.setString(2, chno);
+            ps.executeQuery();
+            printResult(ps);
+
+            System.out.println("\nPlease enter new title of the chapter: ");
+            chtitle = br.readLine();
+
+            try {
+                connection.setAutoCommit(false);
+                String chapterUpd = "UPDATE Chapters SET chtitle = ? WHERE pid = ? and chno = ?;";
+
+                PreparedStatement preparedStatement = connection.prepareStatement(chapterUpd);
+                preparedStatement.setString(1, chtitle);
+                preparedStatement.setString(2, pid);
+                preparedStatement.setString(3, chno);
+                preparedStatement.executeUpdate();
+
+                connection.commit();
+                System.out.println("\nTransaction Success!");
+            } catch (SQLException sqlE) {
+                System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                System.out.println(sqlE.getMessage()); // print SQL error message
+                connection.rollback(); //rollback transaction
+                connection.setAutoCommit(true); //reset autocommit to true
+            }
+        } catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
+        }
+    }
+
+
     /**
      * Search for books written by particular author
+     * This function includes TRANSACTION
      */
-    public static void findBooksByAuthor() {
-        String title, ISBN, edition, sname;
+    public static void findBooksByAuthor () {
+        String sid;
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
-            System.out.println("Please enter full name of the author: ");
-            sname = br.readLine();
-            result = statement.executeQuery("SELECT title, ISBN, edition FROM Books NATURAL JOIN Publications " +
-                    "NATURAL JOIN Staff NATURAL JOIN WriteBook WHERE sname = '" + sname + "'");
+
+            System.out.println("Please enter staff ID of the author: ");
+            sid = br.readLine();
+
+            try {
+                connection.setAutoCommit(false);
+                String bookByAuthor = "SELECT title, ISBN, edition, dop FROM Books NATURAL JOIN Publications " +
+                        "NATURAL JOIN WriteBook NATURAL JOIN Staff WHERE sid = ?";
+                PreparedStatement preparedStatement = connection.prepareStatement(bookByAuthor);
+                preparedStatement.setString(1, sid);
+
+                printResult(preparedStatement);
+
+                connection.commit();
+                System.out.println("\nTransaction Success!");
+
+            } catch (SQLException sqlE) {
+                System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                System.out.println(sqlE.getMessage()); // print SQL error message
+                connection.rollback(); //rollback transaction
+                connection.setAutoCommit(true); //reset autocommit to true
+                findBooksByAuthor ();
+            }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("There was an error: " + e.getMessage());
         }
     }
 
     /**
      * Search for books published on particular date
+     * This function includes TRANSACTION
      */
-    public static void findBooksByDate() {
-        String title, ISBN, edition, dop;
+    public static void findBooksByDate () {
+        String dop;
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
+
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
             System.out.println("Please enter book's date of publishing");
-            System.out.println("The date should be in the form YYYY-MM-DD (i.e. 2020-02-02) ");
+            System.out.println("The date should be in the form YYYY-MM-DD (i.e. 2020-02-02): ");
             dop = br.readLine();
-            result = statement.executeQuery("SELECT title, edition, ISBN FROM Books NATURAL JOIN Publications " +
-                    "WHERE dop = '" + dop + "'");
+
+            try {
+                connection.setAutoCommit(false);
+                String bookByDate = "SELECT title, edition, ISBN FROM Books NATURAL JOIN Publications " +
+                        "WHERE dop = ?";
+                PreparedStatement preparedStatement = connection.prepareStatement(bookByDate);
+                preparedStatement.setString(1, dop);
+
+                printResult(preparedStatement);
+                connection.commit();
+                System.out.println("\nTransaction Success!");
+            } catch (SQLException sqlE) {
+                System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                System.out.println(sqlE.getMessage()); // print SQL error message
+                connection.rollback(); //rollback transaction
+                connection.setAutoCommit(true); //reset autocommit to true
+                findBooksByDate ();
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -556,15 +834,37 @@ public class WolfPub {
 
     /**
      * Search for books by particular topics
+     * This function includes TRANSACTION
      */
-    public static void findBooksByTopic() {
-        String title, edition, ISBN, topics;
+    public static void findBooksByTopic () {
+        String topic;
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
+
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
             System.out.println("Please enter the topic of the book: ");
-            topics = br.readLine();
-            result = statement.executeQuery("SELECT title, edition, ISBN FROM Books NATURAL JOIN Publications " +
-                    "WHERE topics LIKE '%" + topics + "%'");
+            topic = br.readLine();
+
+            try {
+                connection.setAutoCommit(false);
+                String bookByTopic = "SELECT title, edition, ISBN FROM Books NATURAL JOIN Publications " +
+                        "NATURAL JOIN HasTopic\n" +
+                        "NATURAL JOIN Topics " +
+                        "WHERE topic LIKE ?";
+                PreparedStatement preparedStatement = connection.prepareStatement(bookByTopic);
+                preparedStatement.setString(1, topic);
+
+                printResult(preparedStatement);
+                connection.commit();
+                System.out.println("\nTransaction Success!");
+            } catch (SQLException sqlE) {
+                System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                System.out.println(sqlE.getMessage()); // print SQL error message
+                connection.rollback(); //rollback transaction
+                connection.setAutoCommit(true); //reset autocommit to true
+                findBooksByTopic();
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -574,53 +874,131 @@ public class WolfPub {
 
     /**
      * Search for articles written by particular author
+     * This function includes TRANSACTION
      */
-    public static void findArticleByAuthor() {
-        String sname, atitle, atext;
+    public static void findArticleByAuthor () {
+        String sid;
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
-            System.out.println("Please enter full name of the author: ");
-            sname = br.readLine();
-            result = statement.executeQuery("SELECT atitle, atext FROM Articles NATURAL JOIN Staff " +
-                    "NATURAL JOIN WriteArticle WHERE sname = '" + sname + "'");
+
+            System.out.println("Please enter staff ID of the author: ");
+            sid = br.readLine();
+
+            try {
+                connection.setAutoCommit(false);
+                String articleByAuthor = "SELECT atitle, atext FROM Articles NATURAL JOIN Staff " +
+                        "NATURAL JOIN WriteArticle WHERE sid = ?";
+                PreparedStatement preparedStatement = connection.prepareStatement(articleByAuthor);
+                preparedStatement.setString(1, sid);
+
+                printResult(preparedStatement);
+
+                connection.commit();
+                System.out.println("\nTransaction Success!");
+
+            } catch (SQLException sqlE) {
+                System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                System.out.println(sqlE.getMessage()); // print SQL error message
+                connection.rollback(); //rollback transaction
+                connection.setAutoCommit(true); //reset autocommit to true
+                findArticleByAuthor ();
+            }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("There was an error: " + e.getMessage());
         }
+
     }
 
     /**
      * Search for articles published on particular date
+     * This function includes TRANSACTION
      */
-    public static void findArticleByDate() {
-        String atitle, atext, dop;
+    public static void findArticleByDate () {
+        String doi;
+
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
+
             System.out.println("Please enter article's date of publishing");
-            System.out.println("The date should be in the form YYYY-MM-DD (i.e. 2020-02-02) ");
-            dop = br.readLine();
-            result = statement.executeQuery("SELECT atitle, atext FROM Articles NATURAL JOIN ContainArticle " +
-                    "NATURAL JOIN (SELECT pid, dop FROM Publications) as Publication WHERE dop = '" + dop + "'");
+            System.out.println("The date should be in the form YYYY-MM-DD (i.e. 2020-02-02): ");
+            doi = br.readLine();
+
+            try {
+                connection.setAutoCommit(false);
+                String articleByDate = "SELECT atitle, atext\n FROM Articles " +
+                        "NATURAL JOIN ContainArticle NATURAL JOIN Issue" +
+                        "NATURAL JOIN (SELECT pid FROM Publications) as Publication\n" +
+                        "WHERE doi = ?";
+                PreparedStatement preparedStatement = connection.prepareStatement(articleByDate);
+                preparedStatement.setString(1, doi);
+
+                printResult(preparedStatement);
+
+                connection.commit();
+                System.out.println("\nTransaction Success!");
+
+            } catch (SQLException sqlE) {
+                System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                System.out.println(sqlE.getMessage()); // print SQL error message
+                connection.rollback(); //rollback transaction
+                connection.setAutoCommit(true); //reset autocommit to true
+                findArticleByDate ();
+            }
+
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("There was an error: " + e.getMessage());
         }
+
     }
 
     /**
      * Search for articles by particular topics
+     * This function includes TRANSACTION
      */
-    public static void findArticleByAuthor() {
-        String atopics, atitle, atext;
+    public static void findArticleByTopic () {
+
+        String topic;
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
+
             System.out.println("Please enter the topic of the article: ");
-            atopics = br.readLine();
-            result = statement.executeQuery("SELECT atitle, atext" +
-                    "FROM Articles WHERE atopics LIKE '%" + atopics + "%';");
+            topic = br.readLine();
+
+            try {
+                connection.setAutoCommit(false);
+                String articleByTopic = "SELECT atitle, atext FROM Articles " +
+                        "NATURAL JOIN ContainArticle NATURAL JOIN PeriodicPublication\n" +
+                        "NATURAL JOIN HasTopic NATURAL JOIN Topics\n" +
+                        "WHERE topic LIKE ?;";
+                PreparedStatement preparedStatement = connection.prepareStatement(articleByTopic);
+                preparedStatement.setString(1, topic);
+
+                printResult(preparedStatement);
+
+                connection.commit();
+                System.out.println("\nTransaction Success!");
+
+            } catch (SQLException sqlE) {
+                System.out.print("Transaction is being rolled back.  An Error Occurred: ");
+                System.out.println(sqlE.getMessage()); // print SQL error message
+                connection.rollback(); //rollback transaction
+                connection.setAutoCommit(true); //reset autocommit to true
+                findArticleByTopic ();
+            }
+
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("There was an error: " + e.getMessage());
         }
+
     }
+
 
 
     public static void enterEmployeePayment() {

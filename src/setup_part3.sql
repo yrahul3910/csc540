@@ -76,35 +76,35 @@ pid INT AUTO_INCREMENT PRIMARY KEY,
 ptype VARCHAR(30) NOT NULL,
 title VARCHAR(250) NOT NULL,
 editor VARCHAR(250),
-topics VARCHAR(200),
-dop DATE,
 url VARCHAR(2048)
 ) AUTO_INCREMENT = 1001;
 
 -- Publications --
-INSERT INTO Publications (ptype, title, editor, dop)
-VALUES ('book', 'introduction to database', 'John',  '2018-10-10');
-INSERT INTO Publications (ptype, title, editor, dop)
-VALUES ('magazine', 'Healthy Diet', 'Ethen',  '2020-02-24');
-INSERT INTO Publications (ptype, title, editor, dop)
-VALUES ('journal', 'Animal Science', '/', '2020-03-01');
-INSERT INTO Publications (ptype, title, editor, dop, url)
-VALUES ('book', 'Food for Today', 'John', '2019-08-02', 'https://bit.ly/2xhTC1e');
-INSERT INTO Publications(ptype, title, editor, dop, url) 
-VALUES ('magazine', 'Birds and Blooms', 'Ethen', '2019-07-20', 'https://bit.ly/2vIN7o4');
+INSERT INTO Publications (ptype, title, editor)
+VALUES ('book', 'introduction to database', 'John');
+INSERT INTO Publications (ptype, title, editor)
+VALUES ('magazine', 'Healthy Diet', 'Ethen');
+INSERT INTO Publications (ptype, title, editor)
+VALUES ('journal', 'Animal Science', '/');
+INSERT INTO Publications (ptype, title, editor, url)
+VALUES ('book', 'Food for Today', 'John', 'https://bit.ly/2xhTC1e');
+INSERT INTO Publications(ptype, title, editor, url) 
+VALUES ('magazine', 'Birds and Blooms', 'Ethen', 'https://bit.ly/2vIN7o4');
 
 
 CREATE TABLE Books(
 pid INT NOT NULL,
 ISBN VARCHAR(50) NOT NULL,
 edition INT NOT NULL,
+dop DATE,
 FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE
-ON DELETE CASCADE
+ON DELETE CASCADE,
+PRIMARY KEY(pid)
 );
 
 
-INSERT INTO Books(pid, ISBN, edition) VALUES (1001, 12345, 2);
-INSERT INTO Books(pid, ISBN, edition) VALUES (1004, 346752, 1);
+INSERT INTO Books(pid, ISBN, edition, dop) VALUES (1001, 12345, 2, '2018-10-10');
+INSERT INTO Books(pid, ISBN, edition, dop) VALUES (1004, 346752, 1, '2019-08-02');
 
 
 CREATE TABLE Chapters(
@@ -126,41 +126,39 @@ VALUES (1001, 4, 'Query Execution', 'Query-execution process', 'https://bit.ly/3
 CREATE TABLE PeriodicPublication (
 pid INT NOT NULL,
 periodicity VARCHAR(50) NOT NULL,
-pptype VARCHAR(30) NOT NULL,
 pptext LONGTEXT NOT NULL,
-doi DATE,
 FOREIGN KEY(pid) REFERENCES Publications(pid)
-ON UPDATE CASCADE
+ON UPDATE CASCADE,
+PRIMARY KEY(pid)
 );
 
-INSERT INTO PeriodicPublication(pid, periodicity, pptype, pptext, doi) 
-VALUES (1002, 'monthly', 'magazine', 'ABC', '2020-02-24');
-INSERT INTO PeriodicPublication(pid, periodicity, pptype, pptext, doi) 
-VALUES (1003, 'monthly', 'journal', 'AAA', '2020-03-01');
-INSERT INTO PeriodicPublication(pid, periodicity, pptype, pptext, doi) 
-VALUES (1005, 'weekly', 'magazine', 'Birds', '2020-01-07');
+INSERT INTO PeriodicPublication(pid, periodicity, pptext) 
+VALUES (1002, 'monthly', 'ABC');
+INSERT INTO PeriodicPublication(pid, periodicity, pptext) 
+VALUES (1003, 'monthly', 'AAA');
+INSERT INTO PeriodicPublication(pid, periodicity, pptext) 
+VALUES (1005, 'weekly', 'Birds');
 
 CREATE TABLE Issue(
 pid INT NOT NULL,
-ino INT NOT NULL,
-PRIMARY KEY(pid, ino),
+doi DATE NOT NULL,
+INDEX (doi),
+PRIMARY KEY(pid, doi),
 FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE
 ON DELETE CASCADE
 );
 
-INSERT INTO Issue (pid, ino)
-VALUES (1002, 1);
-INSERT INTO Issue (pid, ino)
-VALUES (1003, 3);
-INSERT INTO Issue (pid, ino)
-VALUES (1005, 1);
+INSERT INTO Issue (pid, doi)
+VALUES (1002, '2020-02-24');
+INSERT INTO Issue (pid, doi)
+VALUES (1003, '2020-03-01');
+INSERT INTO Issue (pid, doi)
+VALUES (1005, '2020-01-07');
 
 
--- atopics attribute was added
 CREATE TABLE Articles(
 aid INT AUTO_INCREMENT PRIMARY KEY,
 atitle VARCHAR(350) NOT NULL,
-atopics VARCHAR(100),
 doc DATE,
 atext MEDIUMTEXT NOT NULL,
 url VARCHAR(2048)
@@ -219,7 +217,8 @@ CREATE TABLE ConsistOf(
 oid INT NOT NULL,
 pid INT NOT NULL,
 FOREIGN KEY(oid) REFERENCES Orders(oid) ON UPDATE CASCADE,
-FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE
+FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE,
+PRIMARY KEY(oid, pid)
 );
 
 INSERT INTO ConsistOf(oid, pid)
@@ -235,7 +234,8 @@ CREATE TABLE MakeOrder(
 did INT NOT NULL,
 oid INT NOT NULL,
 FOREIGN KEY(did) REFERENCES Distributors(did) ON UPDATE CASCADE,
-FOREIGN KEY(oid) REFERENCES Orders(oid) ON UPDATE CASCADE
+FOREIGN KEY(oid) REFERENCES Orders(oid) ON UPDATE CASCADE,
+PRIMARY KEY(did, oid)
 );
 
 INSERT INTO MakeOrder(did, oid)
@@ -251,24 +251,27 @@ VALUES (2003, 4004);
 CREATE TABLE ContainArticle(
 pid INT NOT NULL,
 aid INT NOT NULL,
+doi DATE NOT NULL,
+PRIMARY KEY(pid, aid, doi),
 FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE,
-FOREIGN KEY(aid) REFERENCES Articles(aid) ON UPDATE CASCADE
+FOREIGN KEY(aid) REFERENCES Articles(aid) ON UPDATE CASCADE,
+FOREIGN KEY(doi) REFERENCES Issue(doi) ON UPDATE CASCADE
 );
 
-INSERT INTO ContainArticle(pid, aid)
-VALUES (1002, 5001);
-INSERT INTO ContainArticle(pid, aid)
-VALUES (1003, 5003);
-INSERT INTO ContainArticle(pid, aid)
-VALUES (1005, 5002);
+INSERT INTO ContainArticle(pid, aid, doi)
+VALUES (1002, 5001, '2020-02-24');
+INSERT INTO ContainArticle(pid, aid, doi)
+VALUES (1003, 5003, '2020-03-01');
+INSERT INTO ContainArticle(pid, aid, doi)
+VALUES (1005, 5002, '2020-01-07');
 
 
 CREATE TABLE Edit(
 pid INT NOT NULL,
 sid INT NOT NULL,
 FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE,
-FOREIGN KEY(sid) REFERENCES Staff(sid)
-ON UPDATE CASCADE
+FOREIGN KEY(sid) REFERENCES Staff(sid) ON UPDATE CASCADE,
+PRIMARY KEY(pid, sid)
 );
 
 INSERT INTO Edit (pid, sid)
@@ -287,8 +290,8 @@ CREATE TABLE WriteArticle(
 aid INT NOT NULL,
 sid INT NOT NULL,
 FOREIGN KEY(aid) REFERENCES Articles(aid) ON UPDATE CASCADE,
-FOREIGN KEY(sid) REFERENCES Staff(sid)
-ON UPDATE CASCADE
+FOREIGN KEY(sid) REFERENCES Staff(sid) ON UPDATE CASCADE,
+PRIMARY KEY(aid, sid)
 );
 
 INSERT INTO WriteArticle (aid, sid)
@@ -302,8 +305,8 @@ CREATE TABLE WriteBook(
 pid INT NOT NULL,
 sid INT NOT NULL,
 FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE,
-FOREIGN KEY(sid) REFERENCES Staff(sid)
-ON UPDATE CASCADE
+FOREIGN KEY(sid) REFERENCES Staff(sid) ON UPDATE CASCADE,
+PRIMARY KEY(pid, sid)
 );
 
 INSERT INTO WriteBook (pid, sid)
@@ -325,7 +328,8 @@ CREATE TABLE HasTopic(
 pid INT NOT NULL,
 topic VARCHAR(50),
 FOREIGN KEY(pid) REFERENCES Publications(pid) ON UPDATE CASCADE,
-FOREIGN KEY(topic) REFERENCES Topics(topic) ON UPDATE CASCADE
+FOREIGN KEY(topic) REFERENCES Topics(topic) ON UPDATE CASCADE,
+PRIMARY KEY(pid, topic)
 );
 
 INSERT INTO HasTopic(pid, topic)
@@ -338,5 +342,3 @@ INSERT INTO HasTopic(pid, topic)
 VALUES (1004, 'health');
 INSERT INTO HasTopic(pid, topic)
 VALUES (1005, 'nature');
-
-
