@@ -10,16 +10,7 @@ public class WolfPubMenu {
         int opt = -1;
         boolean check = false;
 
-        System.out.println("Select a number from the list of options: ");
-        System.out.println("0 All Publications");
-        System.out.println("1 All Books");
-        System.out.println("2 All Periodic Publications");
-        System.out.println("3 All Staff");
-        System.out.println("4 All Authors");
-        System.out.println("5 All Editors");
-        System.out.println("6 All distributors");
-        System.out.println("7 All Orders");
-        System.out.print("Your option ---> ");
+        printMainMenu();
 
         System.out.println(" Add staff member");
         System.out.println(" Update staff information");
@@ -33,16 +24,7 @@ public class WolfPubMenu {
          */
         while (check == false){
             if (!sc.hasNextInt()){
-                System.out.println("Select a number from the list of options: ");
-                System.out.println("0 All Publications");
-                System.out.println("1 All Books");
-                System.out.println("2 All Periodic Publications");
-                System.out.println("3 All Staff");
-                System.out.println("4 All Authors");
-                System.out.println("5 All Editors");
-                System.out.println("6 All distributors");
-                System.out.println("7 All Orders");
-                System.out.print("Your option ---> ");
+                printMainMenu();
                 sc.next()
             } else if (sc.hasNextInt()){
                 opt = Integer.parseInt(sc.next());
@@ -50,22 +32,26 @@ public class WolfPubMenu {
                     check = true;
                 }
                 else {
-                    System.out.println("Select a number from the list of options: ");
-                    System.out.println("0 All Publications");
-                    System.out.println("1 All Books");
-                    System.out.println("2 All Periodic Publications");
-                    System.out.println("3 All Staff");
-                    System.out.println("4 All Authors");
-                    System.out.println("5 All Editors");
-                    System.out.println("6 All distributors");
-                    System.out.println("7 All Orders");
-                    System.out.print("Your option ---> ");
+                    printMainMenu();
                 }
             }
 
         }
         return opt;
 
+    }
+
+    private static void printMainMenu() {
+        System.out.println("Select a number from the list of options: ");
+        System.out.println("0 All Publications");
+        System.out.println("1 All Books");
+        System.out.println("2 All Periodic Publications");
+        System.out.println("3 All Staff");
+        System.out.println("4 All Authors");
+        System.out.println("5 All Editors");
+        System.out.println("6 All distributors");
+        System.out.println("7 All Orders");
+        System.out.print("Your option ---> ");
     }
 
     public static int loginMenu() {
