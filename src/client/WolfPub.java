@@ -25,19 +25,24 @@ public class WolfPub {
     /**
      * Helper functions
      */
-    private void runStatement(String query) {
+    private void runStatement(boolean update, String query) {
         try {
             Statement stmt = this.con.createStatement();
 
-            ResultSet rs = stmt.executeQuery(query);
-            PrintCursor printer = new PrintCursor(rs);
-            printer.print();
+            if (update) {
+                stmt.executeUpdate(query);
+            }
+            else {
+                ResultSet rs = stmt.executeQuery(query);
+                PrintCursor printer = new PrintCursor(rs);
+                printer.print();
+            }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
 
-    private void runPreparedStatement(String query, String... rest) {
+    private void runPreparedStatement(boolean update, String query, String... rest) {
         try {
             PreparedStatement stmt = this.con.prepareStatement(query);
 
@@ -47,9 +52,13 @@ public class WolfPub {
                 counter++;
             }
 
-            ResultSet rs = stmt.executeQuery();
-            PrintCursor printer = new PrintCursor(rs);
-            printer.print();
+            if (update)
+                stmt.executeUpdate(query, rest);
+            else {
+                ResultSet rs = stmt.executeQuery();
+                PrintCursor printer = new PrintCursor(rs);
+                printer.print();
+            }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -58,7 +67,7 @@ public class WolfPub {
     /**
      * Function for executing Prepared Statement and printing the results in clear manner
      */
-    public static void printResult(PreparedStatement ps){
+    public  void printResult(PreparedStatement ps){
         try {
             ResultSet rs = ps.executeQuery();
             ResultSetMetaData md = rs.getMetaData(); //getting metadata object
@@ -78,11 +87,10 @@ public class WolfPub {
      * Entering new publication (book, magazine or journal)
      *  This function inlcudes  TRANSACTIONS
      */
-    public static void enterPublicationInfo(){
-
-        try{
+    public  void enterPublicationInfo() {
+        try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
             String title, editor, edition, ISBN, periodicity,
                     dop, doi, pptext, url, ptype;
 
@@ -108,12 +116,12 @@ public class WolfPub {
                 url = br.readLine();
 
                 try{
-                    connection.setAutoCommit(false); //set autocommit false
+                    this.con.setAutoCommit(false); //set autocommit false
 
                     String pubIns = "INSERT INTO Publications(title, ptype, editor, dop, url) "
                             + "VALUES(?,?,?,?,?)";
 
-                    PreparedStatement preparedStatement = connection.prepareStatement(pubIns);
+                    PreparedStatement preparedStatement = this.con.prepareStatement(pubIns);
                     preparedStatement.setString(1, title);
                     preparedStatement.setString(2, "book");
                     preparedStatement.setString(3, editor);
@@ -123,14 +131,14 @@ public class WolfPub {
 
                     String bookIns = "INSERT INTO BOOKS (pid, ISBN, edition)"
                             + "VALUES((SELECT pid FROM Publications WHERE title = ? AND ptype = ? ), ?, ?)";
-                    PreparedStatement addBook = connection.prepareStatement(bookIns);
+                    PreparedStatement addBook = this.con.prepareStatement(bookIns);
                     addBook.setString(1, title);
                     addBook.setString(2, "book");
                     addBook.setString(3, ISBN);
                     addBook.setString(4, edition);
                     addBook.executeUpdate();
 
-                    connection.commit(); //commits the transaction to the database if no error has been detected
+                    this.con.commit(); //commits the transaction to the database if no error has been detected
                     System.out.println( "\nTransaction Success!!" );
                 }
                 catch (SQLException sqlE) // the SQL was malformed
@@ -138,8 +146,8 @@ public class WolfPub {
                     //If error is found, the transaction is rolled back and the table is returned to its previous state
                     System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
                     System.out.println( sqlE.getMessage() ); // print SQL error message
-                    connection.rollback(); //rollback transaction
-                    connection.setAutoCommit(true); //reset autocommit to true
+                    this.con.rollback(); //rollback transaction
+                    this.con.setAutoCommit(true); //reset autocommit to true
                 }
 
 
@@ -159,10 +167,10 @@ public class WolfPub {
                 url = br.readLine();
 
                 try {
-                    connection.setAutoCommit(false);
+                    this.con.setAutoCommit(false);
                     String pubIns = "INSERT INTO Publications(title, ptype, editor, dop, url) "
                             + "VALUES(?,?,?,?,?)";
-                    PreparedStatement preparedStatement = connection.prepareStatement(pubIns);
+                    PreparedStatement preparedStatement = this.con.prepareStatement(pubIns);
                     preparedStatement.setString(1, title);
                     preparedStatement.setString(2, "magazine");
                     preparedStatement.setString(3, editor);
@@ -172,7 +180,7 @@ public class WolfPub {
 
                     String magIns = "INSERT INTO periodicpublication((SELECT pid FROM Publications WHERE title = ? AND ptype = ? AND dop = ? ),"
                             + " periodicity, pptype, pptext, doi) VALUES(?,?,?,?)";
-                    PreparedStatement preparedStat = connection.prepareStatement(magIns);
+                    PreparedStatement preparedStat = this.con.prepareStatement(magIns);
                     preparedStat.setString(1, title);
                     preparedStat.setString(2, "magazine");
                     preparedStat.setString(3, dop);
@@ -183,7 +191,7 @@ public class WolfPub {
                     preparedStat.executeUpdate();
 
 
-                    connection.commit(); //commits the transaction to the database if no error has been detected
+                    this.con.commit(); //commits the transaction to the database if no error has been detected
                     System.out.println( "\nTransaction Success!!" );
                 }
                 catch (SQLException sqlE) // the SQL was malformed
@@ -191,8 +199,8 @@ public class WolfPub {
                     //If error is found, the transaction is rolled back and the table is returned to its previous state
                     System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
                     System.out.println( sqlE.getMessage() ); // print SQL error message
-                    connection.rollback(); //rollback transaction
-                    connection.setAutoCommit(true); //reset autocommit to true
+                    this.con.rollback(); //rollback transaction
+                    this.con.setAutoCommit(true); //reset autocommit to true
                 }
 
 
@@ -211,10 +219,10 @@ public class WolfPub {
                 url = br.readLine();
 
                 try {
-                    connection.setAutoCommit(false);
+                    this.con.setAutoCommit(false);
                     String pubIns = "INSERT INTO Publications(title, ptype, editor, dop, url) "
                             + "VALUES(?,?,?,?,?)";
-                    PreparedStatement preparedStatement = connection.prepareStatement(pubIns);
+                    PreparedStatement preparedStatement = this.con.prepareStatement(pubIns);
                     preparedStatement.setString(1, title);
                     preparedStatement.setString(2, "journal");
                     preparedStatement.setString(3, editor);
@@ -224,7 +232,7 @@ public class WolfPub {
 
                     String magIns = "INSERT INTO periodicpublication( pid, periodicity, pptype, pptext, doi) "
                             + "VALUES((SELECT pid FROM Publications WHERE title = ? AND ptype = ? AND dop = ? ),?,?,?,?)";
-                    PreparedStatement preparedStat = connection.prepareStatement(magIns);
+                    PreparedStatement preparedStat = this.con.prepareStatement(magIns);
                     preparedStat.setString(1, title);
                     preparedStat.setString(2, "journal");
                     preparedStat.setString(3, dop);
@@ -235,7 +243,7 @@ public class WolfPub {
                     preparedStat.executeUpdate();
 
 
-                    connection.commit(); //commits the transaction to the database if no error has been detected
+                    this.con.commit(); //commits the transaction to the database if no error has been detected
                     System.out.println( "\nTransaction Success!!" );
                 }
                 catch (SQLException sqlE) // the SQL was malformed
@@ -243,8 +251,8 @@ public class WolfPub {
                     //If error is found, the transaction is rolled back and the table is returned to its previous state
                     System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
                     System.out.println( sqlE.getMessage() ); // print SQL error message
-                    connection.rollback(); //rollback transaction
-                    connection.setAutoCommit(true); //reset autocommit to true
+                    this.con.rollback(); //rollback transaction
+                    this.con.setAutoCommit(true); //reset autocommit to true
                 }
 
             }
@@ -269,12 +277,12 @@ public class WolfPub {
      * This function includes TRANSACTIONS
      */
 
-    public static void updatePublication() {
+    public  void updatePublication() {
 
         try {
 
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
             String pid, title, editor, edition, ISBN, periodicity,
                     dop, pptext, url, ptype;
 
@@ -284,7 +292,7 @@ public class WolfPub {
 
             //printReport(String.format("SELECT * FROM publications WHERE pid = '%s'", pid));
             String stmt = "SELECT * FROM publications WHERE pid = ?" ;
-            PreparedStatement preparedSta = connection.prepareStatement(stmt);
+            PreparedStatement preparedSta = this.con.prepareStatement(stmt);
             preparedSta.setString(1, pid);
 
             ResultSet rsp = preparedSta.executeQuery();
@@ -294,7 +302,7 @@ public class WolfPub {
             if (rsp.getString("ptype").equals("journal")||
                     rsp.getString("ptype").equals("magazine")) {
                 String showPub = "SELECT * FROM publications NATURAL JOIN periodicpublication WHERE pid = ?";
-                PreparedStatement stat = connection.prepareStatement(showPub);
+                PreparedStatement stat = this.con.prepareStatement(showPub);
                 stat.setString(1, pid);
                 stat.executeQuery();
 
@@ -310,9 +318,9 @@ public class WolfPub {
                 System.out.println("Please enter new URL: ");
                 url = br.readLine();
                 try {
-                    connection.setAutoCommit(false);
+                    this.con.setAutoCommit(false);
                     String pUp = "UPDATE publications SET ptype = ?, title = ?, editor = ?, url = ? WHERE pid = ?";
-                    PreparedStatement preparedStatement = connection.prepareStatement(pUp);
+                    PreparedStatement preparedStatement = this.con.prepareStatement(pUp);
                     preparedStatement.setString(1, "journal");
                     preparedStatement.setString(2, title);
                     preparedStatement.setString(3, editor);
@@ -321,7 +329,7 @@ public class WolfPub {
                     preparedStatement.executeUpdate();
 
                     String ppUp = "UPDATE periodicpublication SET periodicity = ?, pptype = ?, pptext = ?, WHERE pid = ?";
-                    PreparedStatement preparedStat = connection.prepareStatement(ppUp);
+                    PreparedStatement preparedStat = this.con.prepareStatement(ppUp);
                     preparedStat.setString(1, periodicity);
                     preparedStat.setString(2, "magazine");
                     preparedStat.setString(3, pptext);
@@ -329,7 +337,7 @@ public class WolfPub {
                     preparedStat.executeUpdate();
 
 
-                    connection.commit(); //commits the transaction to the database if no error has been detected
+                    this.con.commit(); //commits the transaction to the database if no error has been detected
                     System.out.println( "\nTransaction Success!!" );
                 }
                 catch (SQLException sqlE) // the SQL was malformed
@@ -337,14 +345,14 @@ public class WolfPub {
                     //If error is found, the transaction is rolled back and the table is returned to its previous state
                     System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
                     System.out.println( sqlE.getMessage() ); // print SQL error message
-                    connection.rollback(); //rollback transaction
-                    connection.setAutoCommit(true); //reset autocommit to true
+                    this.con.rollback(); //rollback transaction
+                    this.con.setAutoCommit(true); //reset autocommit to true
                 }
 
             }
             if (rsp.getString("ptype").equals("book")) {
                 String showBook = "SELECT * FROM publications NATURAL JOIN Books WHERE pid = ?";
-                PreparedStatement stat = connection.prepareStatement(showBook);
+                PreparedStatement stat = this.con.prepareStatement(showBook);
                 stat.setString(1, pid);
                 stat.executeQuery();
                 printResult(stat);
@@ -362,9 +370,9 @@ public class WolfPub {
                 url = br.readLine();
 
                 try {
-                    connection.setAutoCommit(false);
+                    this.con.setAutoCommit(false);
                     String Up = "UPDATE publications SET ptype = ?, title = ?, editor = ?, url = ? WHERE pid = ?";
-                    PreparedStatement preparedStatement = connection.prepareStatement(Up);
+                    PreparedStatement preparedStatement = this.con.prepareStatement(Up);
                     preparedStatement.setString(1, "book");
                     preparedStatement.setString(2, title);
                     preparedStatement.setString(3, editor);
@@ -373,7 +381,7 @@ public class WolfPub {
                     preparedStatement.executeUpdate();
 
                     String bUp = "UPDATE books SET ISBN = ?, edition = ?, dop = ? WHERE pid = ?";
-                    PreparedStatement prepared = connection.prepareStatement(bUp);
+                    PreparedStatement prepared = this.con.prepareStatement(bUp);
                     prepared.setString(1, ISBN);
                     prepared.setString(2, edition);
                     prepared.setString(3, dop);
@@ -381,7 +389,7 @@ public class WolfPub {
                     prepared.executeUpdate();
 
 
-                    connection.commit(); //commits the transaction to the database if no error has been detected
+                    this.con.commit(); //commits the transaction to the database if no error has been detected
                     System.out.println( "\nTransaction Success!!" );
                 }
                 catch (SQLException sqlE) // the SQL was malformed
@@ -389,8 +397,8 @@ public class WolfPub {
                     //If error is found, the transaction is rolled back and the table is returned to its previous state
                     System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
                     System.out.println( sqlE.getMessage() ); // print SQL error message
-                    connection.rollback(); //rollback transaction
-                    connection.setAutoCommit(true); //reset autocommit to true
+                    this.con.rollback(); //rollback transaction
+                    this.con.setAutoCommit(true); //reset autocommit to true
                 }
 
 
@@ -405,7 +413,7 @@ public class WolfPub {
     }
 
 
-    public static void enterBookInfo() {
+    public  void enterBookInfo() {
         //Inserts new rows into the Customers table based on what the user inputs
         try {
             //Stores the values in the appropriate variables
@@ -418,17 +426,17 @@ public class WolfPub {
             edition = br.readLine();
 
             try {
-                connection.setAutoCommit(false); //set autocommit to false
+                this.con.setAutoCommit(false); //set autocommit to false
                 statement.executeUpdate("INSERT INTO Books(ISBN, edition) " +
                         "VALUES ( " + "'" + ISBN + "', '" + edition + "'" + ");"); //inserts a row in the Book's table with the appropriate values
-                connection.commit(); //commit the transaction if there is no error
+                this.con.commit(); //commit the transaction if there is no error
                 System.out.println("\nTransaction Success!"); //print error message
             } catch (SQLException sqlE) {
                 //If error is found, the transaction is rolled back and the table is returned to its previous state
                 System.out.print("Transaction is being rolled back.  An Error Occurred: ");
                 System.out.println(sqlE); //print the error message
-                connection.rollback(); //rollback the transaction
-                connection.setAutoCommit(true); //set the autocommit to true
+                this.con.rollback(); //rollback the transaction
+                this.con.setAutoCommit(true); //set the autocommit to true
             }
 
         }
@@ -442,11 +450,11 @@ public class WolfPub {
      * This function has TRANSACTIONS
      */
 
-    public static void assignEditor() {
+    public  void assignEditor() {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
             String pid, sid;
 
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -456,14 +464,14 @@ public class WolfPub {
             sid = br.readLine();
 
             try {
-                connection.setAutoCommit(false);
+                this.con.setAutoCommit(false);
                 String assign = "INSERT INTO edit (pid, sid) VALUES(?,?)";
-                PreparedStatement preparedStatement = connection.prepareStatement(assign);
+                PreparedStatement preparedStatement = this.con.prepareStatement(assign);
                 preparedStatement.setString(1, pid);
                 preparedStatement.setString(2, sid);
                 preparedStatement.executeUpdate();
 
-                connection.commit(); //commits the transaction to the database if no error has been detected
+                this.con.commit(); //commits the transaction to the database if no error has been detected
                 System.out.println( "\nTransaction Success!!" );
             }
             catch (SQLException sqlE) // the SQL was malformed
@@ -471,8 +479,8 @@ public class WolfPub {
                 //If error is found, the transaction is rolled back and the table is returned to its previous state
                 System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
                 System.out.println( sqlE.getMessage() ); // print SQL error message
-                connection.rollback(); //rollback transaction
-                connection.setAutoCommit(true); //reset autocommit to true
+                this.con.rollback(); //rollback transaction
+                this.con.setAutoCommit(true); //reset autocommit to true
             }
 
 
@@ -490,11 +498,11 @@ public class WolfPub {
      * This function has TRANSACTIONS
      */
 
-    public static void showPublicationEditor() {
+    public  void showPublicationEditor() {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
             String sid;
 
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -502,9 +510,9 @@ public class WolfPub {
             sid = br.readLine();
 
             try {
-                connection.setAutoCommit(false);
+                this.con.setAutoCommit(false);
                 String stmt = "SELECT * FROM publications NATURAL JOIN edit WHERE sid = ?" ;
-                PreparedStatement prepared = connection.prepareStatement(stmt);
+                PreparedStatement prepared = this.con.prepareStatement(stmt);
                 prepared.setString(1, sid);
 
                 ResultSet rsp = prepared.executeQuery();
@@ -515,7 +523,7 @@ public class WolfPub {
                     String statement = "SELECT pid, ptype, title, editor, periodicity, pptext, doi, topic"
                             + " FROM publications NATURAL JOIN edit NATURAL JOIN periodicpublication"
                             + " NATURAL JOIN issue NATURAL JOIN hastopic WHERE sid = ?" ;
-                    PreparedStatement prepareds = connection.prepareStatement(statement);
+                    PreparedStatement prepareds = this.con.prepareStatement(statement);
                     prepareds.setString(1, sid);
                     prepareds.executeQuery();
                     printResult(prepareds);
@@ -525,7 +533,7 @@ public class WolfPub {
                     String statement = "SELECT pid, ptype, title, editor, topic, edition, ISBN, dop"
                             + " FROM publications NATURAL JOIN edit NATURAL JOIN books"
                             + " NATURAL JOIN hastopic WHERE sid = ?" ;
-                    PreparedStatement prepareds = connection.prepareStatement(statement);
+                    PreparedStatement prepareds = this.con.prepareStatement(statement);
                     prepareds.setString(1, sid);
                     prepareds.executeQuery();
                     printResult(prepareds);
@@ -534,7 +542,7 @@ public class WolfPub {
 
 
 
-                connection.commit(); //commits the transaction to the database if no error has been detected
+                this.con.commit(); //commits the transaction to the database if no error has been detected
                 System.out.println( "\nTransaction Success!!" );
             }
             catch (SQLException sqlE) // the SQL was malformed
@@ -542,8 +550,8 @@ public class WolfPub {
                 //If error is found, the transaction is rolled back and the table is returned to its previous state
                 System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
                 System.out.println( sqlE.getMessage() ); // print SQL error message
-                connection.rollback(); //rollback transaction
-                connection.setAutoCommit(true); //reset autocommit to true
+                this.con.rollback(); //rollback transaction
+                this.con.setAutoCommit(true); //reset autocommit to true
             }
 
         }
@@ -557,11 +565,11 @@ public class WolfPub {
      * This function contains TRANSACTIONS
      */
 
-    public static void enterArticle() {
+    public  void enterArticle() {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
             String atitle, atext, url;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Please enter title of article :");
@@ -571,18 +579,18 @@ public class WolfPub {
             System.out.println("Please enter url of article :");
             url = br.readLine();
             try{
-                connection.setAutoCommit(false); //set autocommit false
+                this.con.setAutoCommit(false); //set autocommit false
 
                 String artIns = "INSERT INTO Articles(atitle, atext, url) "
                         + "VALUES(?,?,?)";
 
-                PreparedStatement preparedStatement = connection.prepareStatement(artIns);
+                PreparedStatement preparedStatement = this.con.prepareStatement(artIns);
                 preparedStatement.setString(1, atitle);
                 preparedStatement.setString(2, atext);
                 preparedStatement.setString(3, url);
                 preparedStatement.executeUpdate(); //insert new article
 
-                connection.commit(); //commits the transaction to the database if no error has been detected
+                this.con.commit(); //commits the transaction to the database if no error has been detected
                 System.out.println( "\nTransaction Success!!" );
             }
             catch (SQLException sqlE) // the SQL was malformed
@@ -590,8 +598,8 @@ public class WolfPub {
                 //If error is found, the transaction is rolled back and the table is returned to its previous state
                 System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
                 System.out.println( sqlE.getMessage() ); // print SQL error message
-                connection.rollback(); //rollback transaction
-                connection.setAutoCommit(true); //reset autocommit to true
+                this.con.rollback(); //rollback transaction
+                this.con.setAutoCommit(true); //reset autocommit to true
             }
         }
 
@@ -601,7 +609,7 @@ public class WolfPub {
     }
 
 
-    public static void updateBookInfo() {
+    public  void updateBookInfo() {
         //Asks user to enter new information about Book
         try {
             String pid, ISBN, edition;
@@ -615,16 +623,16 @@ public class WolfPub {
             edition = br.readLine();
 
             try {
-                connection.setAutoCommit(false); //set autocommit to false
+                this.con.setAutoCommit(false); //set autocommit to false
                 statement.executeUpdate(String.format("UPDATE BOOKS SET ISBN='%s', edition ='%s' WHERE pid = '%s' ", ISBN, edition, pid));
-                connection.commit(); //if there is no error commit the transaction
+                this.con.commit(); //if there is no error commit the transaction
                 System.out.println("\nTransaction Success!"); //print success message
             } catch (SQLException sqlE) {
                 //If error is found, the transaction is rolled back and the table is returned to its previous state
                 System.out.print("Transaction is being rolled back.  An Error Occurred: ");
                 System.out.println(sqlE); //print the error message
-                connection.rollback(); //rollback the transaction
-                connection.setAutoCommit(true); //set autocommit to true
+                this.con.rollback(); //rollback the transaction
+                this.con.setAutoCommit(true); //set autocommit to true
             }
 
         }
@@ -640,11 +648,11 @@ public class WolfPub {
      * Enter new Issue of Periodic Publication
      * This function includes TRANSACTION
      */
-    public static void enterIssue() {
+    public  void enterIssue() {
         String pid, doi;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
 
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
             System.out.println("Please enter Publication ID: ");
@@ -653,21 +661,21 @@ public class WolfPub {
             doi = br.readLine();
 
             try {
-                connection.setAutoCommit(false);
+                this.con.setAutoCommit(false);
                 String issueIns = "INSERT INTO Issue (pid, doi) VALUES (?, ?);";
 
-                PreparedStatement preparedStatement = connection.prepareStatement(issueIns);
+                PreparedStatement preparedStatement = this.con.prepareStatement(issueIns);
                 preparedStatement.setString(1, pid);
                 preparedStatement.setString(2, doi);
                 preparedStatement.executeUpdate();
 
-                connection.commit();
+                this.con.commit();
                 System.out.println("\nTransaction Success!");
             } catch (SQLException sqlE) {
                 System.out.print("Transaction is being rolled back.  An Error Occurred: ");
                 System.out.println(sqlE.getMessage()); // print SQL error message
-                connection.rollback(); //rollback transaction
-                connection.setAutoCommit(true); //reset autocommit to true
+                this.con.rollback(); //rollback transaction
+                this.con.setAutoCommit(true); //reset autocommit to true
             }
         } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());
@@ -678,11 +686,11 @@ public class WolfPub {
      * Update date of Issue of Periodic Publication
      * This function includes TRANSACTION
      */
-    public static void updateIssue() {
+    public  void updateIssue() {
         String pid, doi1, doi2;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
 
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
             System.out.println("Please enter Publication ID: ");
@@ -693,22 +701,22 @@ public class WolfPub {
             doi2 = br.readLine();
 
             try {
-                connection.setAutoCommit(false);
+                this.con.setAutoCommit(false);
                 String issueIns = "UPDATE Issue SET doi = ? WHERE pid = ? and doi = ?;";
 
-                PreparedStatement preparedStatement = connection.prepareStatement(issueIns);
+                PreparedStatement preparedStatement = this.con.prepareStatement(issueIns);
                 preparedStatement.setString(1, doi2);
                 preparedStatement.setString(2, pid);
                 preparedStatement.setString(3, doi1);
                 preparedStatement.executeUpdate();
 
-                connection.commit();
+                this.con.commit();
                 System.out.println("\nTransaction Success!");
             } catch (SQLException sqlE) {
                 System.out.print("Transaction is being rolled back.  An Error Occurred: ");
                 System.out.println(sqlE.getMessage()); // print SQL error message
-                connection.rollback(); //rollback transaction
-                connection.setAutoCommit(true); //reset autocommit to true
+                this.con.rollback(); //rollback transaction
+                this.con.setAutoCommit(true); //reset autocommit to true
             }
         } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());
@@ -720,11 +728,11 @@ public class WolfPub {
      * Delete particular Issue of Periodic Publication
      * This function includes TRANSACTION
      */
-    public static void deleteIssue() {
+    public void deleteIssue() {
         String pid, doi;
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            //Class.forName("com.mysql.cj.jdbc.Driver");
+            //Connection this.con = DriverManager.getConnection(url, uname, pass);
 
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
             System.out.println("Please enter Publication ID: ");
@@ -733,21 +741,22 @@ public class WolfPub {
             doi = br.readLine();
 
             try {
-                connection.setAutoCommit(false);
-                String issueIns = "DELETE FROM Issue WHERE pid = ? and doi = ?;";
+                this.con.setAutoCommit(false);
+                String preparedQuery = "DELETE FROM Issue WHERE pid = ? and doi = ?;";
 
-                PreparedStatement preparedStatement = connection.prepareStatement(issueIns);
+                /*PreparedStatement preparedStatement = this.con.prepareStatement(issueIns);
                 preparedStatement.setString(1, pid);
                 preparedStatement.setString(2, doi);
-                preparedStatement.executeUpdate();
+                preparedStatement.executeUpdate();*/
+                runPreparedStatement(true, preparedQuery, pid, doi);
 
-                connection.commit();
+                this.con.commit();
                 System.out.println("\nTransaction Success!");
             } catch (SQLException sqlE) {
                 System.out.print("Transaction is being rolled back.  An Error Occurred: ");
                 System.out.println(sqlE.getMessage()); // print SQL error message
-                connection.rollback(); //rollback transaction
-                connection.setAutoCommit(true); //reset autocommit to true
+                this.con.rollback(); //rollback transaction
+                this.con.setAutoCommit(true); //reset autocommit to true
             }
         } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());
@@ -759,18 +768,18 @@ public class WolfPub {
      * Update Article's title
      * This function includes TRANSACTION
      */
-    public static void UpdateArticleTitle() {
+    public  void UpdateArticleTitle() {
         String aid, atitle;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
 
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
             System.out.println("Please enter Article ID: ");
             aid = br.readLine();
 
             String showArticles = "SELECT * FROM Articles WHERE aid = ?";
-            PreparedStatement ps = connection.prepareStatement(showArticles);
+            PreparedStatement ps = this.con.prepareStatement(showArticles);
             ps.setString(1, aid);
             ps.executeQuery();
             printResult(ps);
@@ -779,21 +788,21 @@ public class WolfPub {
             atitle = br.readLine();
 
             try {
-                connection.setAutoCommit(false);
+                this.con.setAutoCommit(false);
                 String articleUpd = "UPDATE Articles SET atitle = ? WHERE aid = ?;";
 
-                PreparedStatement preparedStatement = connection.prepareStatement(articleUpd);
+                PreparedStatement preparedStatement = this.con.prepareStatement(articleUpd);
                 preparedStatement.setString(1, atitle);
                 preparedStatement.setString(2, aid);
                 preparedStatement.executeUpdate();
 
-                connection.commit();
+                this.con.commit();
                 System.out.println("\nTransaction Success!");
             } catch (SQLException sqlE) {
                 System.out.print("Transaction is being rolled back.  An Error Occurred: ");
                 System.out.println(sqlE.getMessage()); // print SQL error message
-                connection.rollback(); //rollback transaction
-                connection.setAutoCommit(true); //reset autocommit to true
+                this.con.rollback(); //rollback transaction
+                this.con.setAutoCommit(true); //reset autocommit to true
             }
         } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());
@@ -805,12 +814,12 @@ public class WolfPub {
      * Update Chapter's title
      * This function includes TRANSACTION
      */
-    public static void UpdateChapterTitle() {
+    public  void UpdateChapterTitle() {
         String pid, chno, chtitle;
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
 
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
             System.out.println("Please enter Publication ID where you want to update chapter's title: ");
@@ -819,7 +828,7 @@ public class WolfPub {
             chno = br.readLine();
 
             String showChapter = "SELECT * FROM Chapters WHERE pid = ? and chno = ?";
-            PreparedStatement ps = connection.prepareStatement(showChapter);
+            PreparedStatement ps = this.con.prepareStatement(showChapter);
             ps.setString(1, pid);
             ps.setString(2, chno);
             ps.executeQuery();
@@ -829,22 +838,22 @@ public class WolfPub {
             chtitle = br.readLine();
 
             try {
-                connection.setAutoCommit(false);
+                this.con.setAutoCommit(false);
                 String chapterUpd = "UPDATE Chapters SET chtitle = ? WHERE pid = ? and chno = ?;";
 
-                PreparedStatement preparedStatement = connection.prepareStatement(chapterUpd);
+                PreparedStatement preparedStatement = this.con.prepareStatement(chapterUpd);
                 preparedStatement.setString(1, chtitle);
                 preparedStatement.setString(2, pid);
                 preparedStatement.setString(3, chno);
                 preparedStatement.executeUpdate();
 
-                connection.commit();
+                this.con.commit();
                 System.out.println("\nTransaction Success!");
             } catch (SQLException sqlE) {
                 System.out.print("Transaction is being rolled back.  An Error Occurred: ");
                 System.out.println(sqlE.getMessage()); // print SQL error message
-                connection.rollback(); //rollback transaction
-                connection.setAutoCommit(true); //reset autocommit to true
+                this.con.rollback(); //rollback transaction
+                this.con.setAutoCommit(true); //reset autocommit to true
             }
         } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());
@@ -856,33 +865,33 @@ public class WolfPub {
      * Search for books written by particular author
      * This function includes TRANSACTION
      */
-    public static void findBooksByAuthor () {
+    public  void findBooksByAuthor () {
         String sid;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
 
             System.out.println("Please enter staff ID of the author: ");
             sid = br.readLine();
 
             try {
-                connection.setAutoCommit(false);
+                this.con.setAutoCommit(false);
                 String bookByAuthor = "SELECT title, ISBN, edition, dop FROM Books NATURAL JOIN Publications " +
                         "NATURAL JOIN WriteBook NATURAL JOIN Staff WHERE sid = ?";
-                PreparedStatement preparedStatement = connection.prepareStatement(bookByAuthor);
+                PreparedStatement preparedStatement = this.con.prepareStatement(bookByAuthor);
                 preparedStatement.setString(1, sid);
 
                 printResult(preparedStatement);
 
-                connection.commit();
+                this.con.commit();
                 System.out.println("\nTransaction Success!");
 
             } catch (SQLException sqlE) {
                 System.out.print("Transaction is being rolled back.  An Error Occurred: ");
                 System.out.println(sqlE.getMessage()); // print SQL error message
-                connection.rollback(); //rollback transaction
-                connection.setAutoCommit(true); //reset autocommit to true
+                this.con.rollback(); //rollback transaction
+                this.con.setAutoCommit(true); //reset autocommit to true
                 findBooksByAuthor ();
             }
 
@@ -895,11 +904,11 @@ public class WolfPub {
      * Search for books published on particular date
      * This function includes TRANSACTION
      */
-    public static void findBooksByDate () {
+    public  void findBooksByDate () {
         String dop;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
 
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
             System.out.println("Please enter book's date of publishing");
@@ -907,20 +916,20 @@ public class WolfPub {
             dop = br.readLine();
 
             try {
-                connection.setAutoCommit(false);
+                this.con.setAutoCommit(false);
                 String bookByDate = "SELECT title, edition, ISBN FROM Books NATURAL JOIN Publications " +
                         "WHERE dop = ?";
-                PreparedStatement preparedStatement = connection.prepareStatement(bookByDate);
+                PreparedStatement preparedStatement = this.con.prepareStatement(bookByDate);
                 preparedStatement.setString(1, dop);
 
                 printResult(preparedStatement);
-                connection.commit();
+                this.con.commit();
                 System.out.println("\nTransaction Success!");
             } catch (SQLException sqlE) {
                 System.out.print("Transaction is being rolled back.  An Error Occurred: ");
                 System.out.println(sqlE.getMessage()); // print SQL error message
-                connection.rollback(); //rollback transaction
-                connection.setAutoCommit(true); //reset autocommit to true
+                this.con.rollback(); //rollback transaction
+                this.con.setAutoCommit(true); //reset autocommit to true
                 findBooksByDate ();
             }
 
@@ -933,33 +942,33 @@ public class WolfPub {
      * Search for books by particular topics
      * This function includes TRANSACTION
      */
-    public static void findBooksByTopic () {
+    public  void findBooksByTopic () {
         String topic;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
 
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
             System.out.println("Please enter the topic of the book: ");
             topic = br.readLine();
 
             try {
-                connection.setAutoCommit(false);
+                this.con.setAutoCommit(false);
                 String bookByTopic = "SELECT title, edition, ISBN FROM Books NATURAL JOIN Publications " +
                         "NATURAL JOIN HasTopic\n" +
                         "NATURAL JOIN Topics " +
                         "WHERE topic LIKE ?";
-                PreparedStatement preparedStatement = connection.prepareStatement(bookByTopic);
+                PreparedStatement preparedStatement = this.con.prepareStatement(bookByTopic);
                 preparedStatement.setString(1, topic);
 
                 printResult(preparedStatement);
-                connection.commit();
+                this.con.commit();
                 System.out.println("\nTransaction Success!");
             } catch (SQLException sqlE) {
                 System.out.print("Transaction is being rolled back.  An Error Occurred: ");
                 System.out.println(sqlE.getMessage()); // print SQL error message
-                connection.rollback(); //rollback transaction
-                connection.setAutoCommit(true); //reset autocommit to true
+                this.con.rollback(); //rollback transaction
+                this.con.setAutoCommit(true); //reset autocommit to true
                 findBooksByTopic();
             }
 
@@ -973,33 +982,33 @@ public class WolfPub {
      * Search for articles written by particular author
      * This function includes TRANSACTION
      */
-    public static void findArticleByAuthor () {
+    public  void findArticleByAuthor () {
         String sid;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
 
             System.out.println("Please enter staff ID of the author: ");
             sid = br.readLine();
 
             try {
-                connection.setAutoCommit(false);
+                this.con.setAutoCommit(false);
                 String articleByAuthor = "SELECT atitle, atext FROM Articles NATURAL JOIN Staff " +
                         "NATURAL JOIN WriteArticle WHERE sid = ?";
-                PreparedStatement preparedStatement = connection.prepareStatement(articleByAuthor);
+                PreparedStatement preparedStatement = this.con.prepareStatement(articleByAuthor);
                 preparedStatement.setString(1, sid);
 
                 printResult(preparedStatement);
 
-                connection.commit();
+                this.con.commit();
                 System.out.println("\nTransaction Success!");
 
             } catch (SQLException sqlE) {
                 System.out.print("Transaction is being rolled back.  An Error Occurred: ");
                 System.out.println(sqlE.getMessage()); // print SQL error message
-                connection.rollback(); //rollback transaction
-                connection.setAutoCommit(true); //reset autocommit to true
+                this.con.rollback(); //rollback transaction
+                this.con.setAutoCommit(true); //reset autocommit to true
                 findArticleByAuthor ();
             }
 
@@ -1013,12 +1022,12 @@ public class WolfPub {
      * Search for articles published on particular date
      * This function includes TRANSACTION
      */
-    public static void findArticleByDate () {
+    public  void findArticleByDate () {
         String doi;
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
 
             System.out.println("Please enter article's date of publishing");
@@ -1026,24 +1035,24 @@ public class WolfPub {
             doi = br.readLine();
 
             try {
-                connection.setAutoCommit(false);
+                this.con.setAutoCommit(false);
                 String articleByDate = "SELECT atitle, atext\n FROM Articles " +
                         "NATURAL JOIN ContainArticle NATURAL JOIN Issue" +
                         "NATURAL JOIN (SELECT pid FROM Publications) as Publication\n" +
                         "WHERE doi = ?";
-                PreparedStatement preparedStatement = connection.prepareStatement(articleByDate);
+                PreparedStatement preparedStatement = this.con.prepareStatement(articleByDate);
                 preparedStatement.setString(1, doi);
 
                 printResult(preparedStatement);
 
-                connection.commit();
+                this.con.commit();
                 System.out.println("\nTransaction Success!");
 
             } catch (SQLException sqlE) {
                 System.out.print("Transaction is being rolled back.  An Error Occurred: ");
                 System.out.println(sqlE.getMessage()); // print SQL error message
-                connection.rollback(); //rollback transaction
-                connection.setAutoCommit(true); //reset autocommit to true
+                this.con.rollback(); //rollback transaction
+                this.con.setAutoCommit(true); //reset autocommit to true
                 findArticleByDate ();
             }
 
@@ -1057,36 +1066,36 @@ public class WolfPub {
      * Search for articles by particular topics
      * This function includes TRANSACTION
      */
-    public static void findArticleByTopic () {
+    public  void findArticleByTopic () {
 
         String topic;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection connection = DriverManager.getConnection(url, uname, pass);
+            Connection this.con = DriverManager.getConnection(url, uname, pass);
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); //used to read in
 
             System.out.println("Please enter the topic of the article: ");
             topic = br.readLine();
 
             try {
-                connection.setAutoCommit(false);
+                this.con.setAutoCommit(false);
                 String articleByTopic = "SELECT atitle, atext FROM Articles " +
                         "NATURAL JOIN ContainArticle NATURAL JOIN PeriodicPublication\n" +
                         "NATURAL JOIN HasTopic NATURAL JOIN Topics\n" +
                         "WHERE topic LIKE ?;";
-                PreparedStatement preparedStatement = connection.prepareStatement(articleByTopic);
+                PreparedStatement preparedStatement = this.con.prepareStatement(articleByTopic);
                 preparedStatement.setString(1, topic);
 
                 printResult(preparedStatement);
 
-                connection.commit();
+                this.con.commit();
                 System.out.println("\nTransaction Success!");
 
             } catch (SQLException sqlE) {
                 System.out.print("Transaction is being rolled back.  An Error Occurred: ");
                 System.out.println(sqlE.getMessage()); // print SQL error message
-                connection.rollback(); //rollback transaction
-                connection.setAutoCommit(true); //reset autocommit to true
+                this.con.rollback(); //rollback transaction
+                this.con.setAutoCommit(true); //reset autocommit to true
                 findArticleByTopic ();
             }
 
@@ -1098,7 +1107,7 @@ public class WolfPub {
 
 
 
-    public static void enterEmployeePayment() {
+    public  void enterEmployeePayment() {
         try {
             int sid;
             String paycheck, paydate;
@@ -1111,16 +1120,16 @@ public class WolfPub {
             sid = br.readLine();
 
             try {
-                connection.setAutoCommit(false); //set autocommit to false
+                this.con.setAutoCommit(false); //set autocommit to false
                 statement.executeUpdate("INSERT INTO Payments (sid, paycheck, paydate)" +
                         "VALUES (" + "'" + sid + "', '" + paycheck + "', '" + paydate + "');");
-                connection.commit(); //commit the transaction if there is no error
+                this.con.commit(); //commit the transaction if there is no error
                 System.out.println("\nTransaction Success!");
             } catch {
                 System.out.print("An error occurred: ");
                 System.out.println(sqlE); //print the error message
-                connection.rollback(); //rollback the transaction
-                connection.setAutoCommit(true); //set autocommit to true
+                this.con.rollback(); //rollback the transaction
+                this.con.setAutoCommit(true); //set autocommit to true
             }
 
         } catch (Exception e) {
@@ -1134,7 +1143,7 @@ public class WolfPub {
     /**
      *
      */
-    public static void enterDistributorInfo() {
+    public  void enterDistributorInfo() {
         //Insert new tuples into Distributors table
         try {
             String dname, dtype, city, address, contact, phno, tot_balance;
@@ -1155,17 +1164,17 @@ public class WolfPub {
             tot_balance = br.readLine();
 
             try {
-                connection.setAutoCommit(false); //set autocommit to false
+                this.con.setAutoCommit(false); //set autocommit to false
                 statement.executeUpdate("INSERT INTO Distributors(dname, dtype, city, address, contact, phno, tot_balance) " +
                         "VALUES (" + "'" + dname + "' ,'" + dtype + "', '" + city + "', "
                         + address + ", '" + contact + "', '" + phno + "', " + tot_balance + "');"); //insert a tuple into the distributors' table
-                connection.commit(); //commit the transaction if there is no error
+                this.con.commit(); //commit the transaction if there is no error
                 System.out.println("\nTransaction Success!");
             } catch (SQLException sqlE) {
                 System.out.print("An error occurred: ");
                 System.out.println(sqlE); //print the error message
-                connection.rollback(); //rollback the transaction
-                connection.setAutoCommit(true); //set autocommit to true
+                this.con.rollback(); //rollback the transaction
+                this.con.setAutoCommit(true); //set autocommit to true
             }
 
         } catch (Exception e) {
@@ -1175,7 +1184,7 @@ public class WolfPub {
 
     }
 
-    public static void updateDistributorInfo() {
+    public  void updateDistributorInfo() {
         try {
             String did, dname, dtype, city, address, contact, phno, tot_balance;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -1198,17 +1207,17 @@ public class WolfPub {
             tot_balance = br.readLine();
 
             try {
-                connection.setAutoCommit(false); //set autocommit to false
+                this.con.setAutoCommit(false); //set autocommit to false
                 statement.executeUpdate(String.format("UPDATE Distributors SET dname='%s', dtype='%s', city='%s', address=%s, contact='%s', phno='%s', tot_balance=%s WHERE did=%s",
                         +dname, dtype, city, address, contact, phno, tot_balance, did));
-                connection.commit(); //commit the transaction if there is no error
+                this.con.commit(); //commit the transaction if there is no error
                 System.out.println("\nTransaction Success!"); //print success message
             } catch (SQLException sqlE) {
                 // If there is an error, the transaction is rolled back, so that the table is returned to the previous state
                 System.out.print("An error occurred: ");
                 System.out.println(sqlE); //print the error message
-                connection.rollback(); //rollback the transaction
-                connection.setAutoCommit(true); //set autocommit to true
+                this.con.rollback(); //rollback the transaction
+                this.con.setAutoCommit(true); //set autocommit to true
             }
 
         } catch (Exception e) {
@@ -1218,7 +1227,7 @@ public class WolfPub {
     }
 
 
-    public static void mainsd(String[] args) {
+    public  void mainsd(String[] args) {
         int action = -1;
         int staffAction = -1;
         //Initializes the entire database. Creates the appropriate tables, sequences, inserts, etc...
@@ -1301,6 +1310,10 @@ public class WolfPub {
 
     }
 
+    /**
+     * Distribution
+     */
+
 
     /**
      * Report generation
@@ -1310,7 +1323,7 @@ public class WolfPub {
                 "FROM Distributors NATURAL JOIN MakeOrder NATURAL JOIN Orders " +
                 "GROUP BY did, MONTHNAME(odate), YEAR(odate);";
 
-        runStatement(query);
+        runStatement(false, query);
     }
 
     public void getTotalPriceByDistributor() {
@@ -1320,7 +1333,7 @@ public class WolfPub {
                 "SELECT did, month, year, SUM(price) AS cost " +
                 "FROM Prices GROUP BY did, month, year ORDER BY did;";
 
-        runStatement(query);
+        runStatement(false, query);
     }
 
     public void getTotalRevenue() {
@@ -1330,7 +1343,7 @@ public class WolfPub {
                 "SELECT ROUND(SUM(price), 2) AS Revenue  " +
                 "FROM Prices;";
 
-        runStatement(query);
+        runStatement(false, query);
     }
 
     public void getTotalExpenses() {
@@ -1345,13 +1358,13 @@ public class WolfPub {
                 "WHERE periodicity <> -1)) " +
                 "SELECT ROUND(SUM(cost), 2) AS TotalCost FROM Costs;";
 
-        runStatement(query);
+        runStatement(false, query);
     }
 
     public void getDistributorCount() {
         final String query = "SELECT COUNT(*) FROM Distributors;";
 
-        runStatement(query);
+        runStatement(false, query);
     }
 
     public void getRevenueByCity() {
@@ -1361,7 +1374,7 @@ public class WolfPub {
                 "SELECT city, SUM(price) AS cost " +
                 "FROM Prices GROUP BY city;";
 
-        runStatement(query);
+        runStatement(false, query);
     }
 
     public void getRevenueByDistributor() {
@@ -1371,7 +1384,7 @@ public class WolfPub {
                 "SELECT dname, SUM(price) AS cost " +
                 "FROM Prices GROUP BY dname;";
 
-        runStatement(query);
+        runStatement(false, query);
     }
 
     public void getRevenueByLocation() {
@@ -1381,7 +1394,7 @@ public class WolfPub {
                 "SELECT address, SUM(price) AS cost " +
                 "FROM Prices GROUP BY address;";
 
-        runStatement(query);
+        runStatement(false, query);
     }
 
     public void getTotalPayByStaffType() {
@@ -1394,6 +1407,6 @@ public class WolfPub {
                 "WHERE periodicity <> -1)) " +
                 "SELECT stype, ROUND(SUM(cost), 2) AS pay FROM Costs GROUP BY stype;";
 
-        runStatement(query);
+        runStatement(false, query);
     }
 }
