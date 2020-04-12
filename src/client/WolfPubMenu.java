@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Scanner;
 
 abstract class Menu {
@@ -10,13 +9,22 @@ class MainMenu extends Menu {
     public int display() {
         System.out.println("Main Menu:\n1. Editing and publishing\n2. Production of publications\n3.Distribution\n4.Reports");
 
-        return new Scanner(System.in).nextInt();
+        int ret = new Scanner(System.in).nextInt();
+
+        if (ret < 1 || ret > 4) {
+            System.out.println("You're a bad bad person. Exiting...");
+            System.exit(0);
+        }
+
+        return ret;
     }
 }
 
 class EditingMenu extends Menu {
     @Override
     public int display() {
+
+
         return 0;
     }
 }
@@ -51,6 +59,6 @@ public class WolfPubMenu {
         submenus[3] = new ReportsMenu();
 
         MainMenu menu = new MainMenu();
-        submenus[menu.display()].display();
+        submenus[menu.display() - 1].display();
     }
 }
