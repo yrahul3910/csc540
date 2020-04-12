@@ -673,8 +673,94 @@ public class WolfPub {
      * Report generation
      */
     public void getCopiesSoldByDistributor() {
-        Statement stmt = this.con.createStatement();
+        final String query = "SELECT did, dname, MONTHNAME(odate), YEAR(odate) " +
+                "FROM Distributors NATURAL JOIN MakeOrder NATURAL JOIN Orders " +
+                "GROUP BY did, MONTHNAME(odate), YEAR(odate);";
 
+        runStatement(query);
     }
 
+    public void getTotalPriceByDistributor() {
+        final String query = "WITH Prices AS (" +
+                "SELECT did, ROUND(price * copies + shcost, 2) AS Price, MONTHNAME(odate) AS month, YEAR(odate) AS year " +
+                "FROM MakeOrder NATURAL JOIN Orders) " +
+                "SELECT did, month, year, SUM(price) AS cost " +
+                "FROM Prices GROUP BY did, month, year ORDER BY did;";
+
+        runStatement(query);
+    }
+
+    public void getTotalRevenue() {
+        final String query = "WITH Prices AS (" +
+                "SELECT did, ROUND(price * copies + shcost, 2) AS Price " +
+                "FROM Orders) " +
+                "SELECT ROUND(SUM(price), 2) AS Revenue  " +
+                "FROM Prices;";
+
+        runStatement(query);
+    }
+
+    public void getTotalExpenses() {
+        final String query = "WITH Costs AS (" +
+                "SELECT shcost AS cost " +
+                "FROM Orders) UNION ALL (" +
+                "SELECT pay AS cost " +
+                "FROM Staff " +
+                "WHERE periodicity = -1) UNION ALL (" +
+                "SELECT pay * (DATEDIFF(NOW(), sdate) / periodicity) AS cost " +
+                "FROM Staff " +
+                "WHERE periodicity <> -1)) " +
+                "SELECT ROUND(SUM(cost), 2) AS TotalCost FROM Costs;";
+
+        runStatement(query);
+    }
+
+    public void getDistributorCount() {
+        final String query = "SELECT COUNT(*) FROM Distributors;";
+
+        runStatement(query);
+    }
+
+    public void getRevenueByCity() {
+        final String query = "WITH Prices AS (" +
+                "SELECT ROUND(price * copies + shcost, 2) AS price, city " +
+                "FROM MakeOrder NATURAL JOIN Orders NATURAL JOIN Distributors) " +
+                "SELECT city, SUM(price) AS cost " +
+                "FROM Prices GROUP BY city;";
+
+        runStatement(query);
+    }
+
+    public void getRevenueByDistributor() {
+        final String query = "WITH Prices AS (" +
+                "SELECT ROUND(price * copies + shcost, 2) AS price, dname " +
+                "FROM MakeOrder NATURAL JOIN Orders NATURAL JOIN Distributors) " +
+                "SELECT dname, SUM(price) AS cost " +
+                "FROM Prices GROUP BY dname;";
+
+        runStatement(query);
+    }
+
+    public void getRevenueByLocation() {
+        final String query = "WITH Prices AS (" +
+                "SELECT ROUND(price * copies + shcost, 2) AS price, address " +
+                "FROM MakeOrder NATURAL JOIN Orders NATURAL JOIN Distributors) " +
+                "SELECT address, SUM(price) AS cost " +
+                "FROM Prices GROUP BY address;";
+
+        runStatement(query);
+    }
+
+    public void getTotalPayByStaffType() {
+        final String query = "WITH Costs AS (" +
+                "SELECT stype, pay AS cost " +
+                "FROM Staff " +
+                "WHERE periodicity = -1) UNION ALL (" +
+                "SELECT stype, pay * (DATEDIFF(NOW(), sdate) / periodicity) AS cost " +
+                "FROM Staff " +
+                "WHERE periodicity <> -1)) " +
+                "SELECT stype, ROUND(SUM(cost), 2) AS pay FROM Costs GROUP BY stype;";
+
+        runStatement(query);
+    }
 }
