@@ -1,83 +1,56 @@
-
+import java.util.ArrayList;
 import java.util.Scanner;
 
+abstract class Menu {
+    public abstract int display();
+}
+
+class MainMenu extends Menu {
+    @Override
+    public int display() {
+        System.out.println("Main Menu:\n1. Editing and publishing\n2. Production of publications\n3.Distribution\n4.Reports");
+
+        return new Scanner(System.in).nextInt();
+    }
+}
+
+class EditingMenu extends Menu {
+    @Override
+    public int display() {
+        return 0;
+    }
+}
+
+class ProductionMenu extends Menu {
+    @Override
+    public int display() {
+        return 0;
+    }
+}
+
+class DistributionMenu extends Menu {
+    @Override
+    public int display() {
+        return 0;
+    }
+}
+
+class ReportsMenu extends Menu {
+    @Override
+    public int display() {
+        return 0;
+    }
+}
+
 public class WolfPubMenu {
+    public static void main(String[] args) {
+        Menu[] submenus =  new Menu[4];
+        submenus[0] = new EditingMenu();
+        submenus[1] = new ProductionMenu();
+        submenus[2] = new DistributionMenu();
+        submenus[3] = new ReportsMenu();
 
-    //Initializing Scanner object for reading from input
-    private static Scanner sc = new Scanner(System.in);
-
-    public static int menuManager() {
-        int opt = -1;
-        boolean check = false;
-
-        printMainMenu();
-
-        System.out.println(" Add staff member");
-        System.out.println(" Update staff information");
-        System.out.println(" Delete staff member");
-        System.out.println(" Enter new distributor");
-
-        /*
-         * Check if the next item is an integer, if it is not show menu again asking for an option.
-         * If it is an integer, check if it matches any existed option.
-         *
-         */
-        while (check == false){
-            if (!sc.hasNextInt()){
-                printMainMenu();
-                sc.next()
-            } else if (sc.hasNextInt()){
-                opt = Integer.parseInt(sc.next());
-                if (opt >= 0 & opt <= 7) {
-                    check = true;
-                }
-                else {
-                    printMainMenu();
-                }
-            }
-
-        }
-        return opt;
-
+        MainMenu menu = new MainMenu();
+        submenus[menu.display()].display();
     }
-
-    private static void printMainMenu() {
-        System.out.println("Select a number from the list of options: ");
-        System.out.println("0 All Publications");
-        System.out.println("1 All Books");
-        System.out.println("2 All Periodic Publications");
-        System.out.println("3 All Staff");
-        System.out.println("4 All Authors");
-        System.out.println("5 All Editors");
-        System.out.println("6 All distributors");
-        System.out.println("7 All Orders");
-        System.out.print("Your option ---> ");
-    }
-
-    public static int loginMenu() {
-        int opt = -1;
-        /*
-         * Check if input value is an integer. If it is an integer, login to the system.
-         * If it is not an integer, error message is printed. Prompt a user for an option.
-         */
-
-        while (opt < 0){
-            System.out.println("Enter 99 to exit ");
-
-            // extra option for billing staff ??
-
-            System.out.println("Enter your login ID (1111 for Manager, 2222 for Author/Editor, 3333 for Distributor, 4444 for Billing Staff): ");
-            while (!sc.hasNextInt()){
-                System.out.println("Invalid input");
-                System.out.println("Enter 99 to exit ");
-                System.out.println("Enter your login ID: ");
-                sc.next();
-            }
-            opt=sc.nextInt();
-        }
-        return opt;
-    }
-
-
-
 }
