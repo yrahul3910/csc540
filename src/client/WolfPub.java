@@ -83,8 +83,8 @@ public class WolfPub {
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection connection = DriverManager.getConnection(url, uname, pass);
-            String title, editor, topics, edition, ISBN, periodicity,
-                    dop, doc, doi, pptext, atext, url, ptype;
+            String title, editor, edition, ISBN, periodicity,
+                    dop, doi, pptext, url, ptype;
 
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Please enter the title of the publication:");
@@ -96,10 +96,8 @@ public class WolfPub {
             ptype = br.readLine();
 
             if(ptype.equals("1")){
-                System.out.println("Please enter the name of editor: "); //maybe we add here command "press "/" if you don't
-                editor = br.readLine();                                                        // editor's name"??
-                System.out.println("Please enter topic of the publication: ");  // the same with topic cause we allow NULLs there
-                topics = br.readLine();
+                System.out.println("Please enter the name of editor: ");
+                editor = br.readLine();
                 System.out.println("Please enter ISBN number: "); //integer or string?
                 ISBN = br.readLine();
                 System.out.println("Please enter edition: ");
@@ -151,14 +149,11 @@ public class WolfPub {
             else if (ptype.equals("2")) {
                 System.out.println("Please enter the name of editor: "); //maybe we add here command "press "/" if you don't
                 editor = br.readLine();                                                        // editor's name"??
-                System.out.println("Please enter topic of the publication: ");  // the same with topic cause we allow NULLs there
-                topics = br.readLine();
                 System.out.println("Please enter the periodicity: ");
                 periodicity = br.readLine();
-                // pptype isn't it redundant? Because we have ptype in Publications
-                System.out.println("Please enter text of magazine: "); //integer or string?
+                System.out.println("Please enter text of magazine: ");
                 pptext = br.readLine();
-                System.out.println("Please enter date of issue: "); // doi and dop is the same (assumption)
+                System.out.println("Please enter date of issue: ");
                 dop = br.readLine();
                 System.out.println("Please enter URL: ");
                 url = br.readLine();
@@ -203,16 +198,14 @@ public class WolfPub {
 
             }
             else if (ptype.equals("3")) {
-                System.out.println("Please enter the name of editor: "); //maybe we add here command "press "/" if you don't
-                editor = br.readLine();                                                        // editor's name"??
-                System.out.println("Please enter topic of the publication: ");  // the same with topic cause we allow NULLs there
-                topics = br.readLine();
+                System.out.println("Please enter the name of editor: ");
+                editor = br.readLine();
                 System.out.println("Please enter the periodicity: ");
                 periodicity = br.readLine();
                 // pptype isn't it redundant? Because we have ptype in Publications
-                System.out.println("Please enter text of magazine: "); //integer or string?
+                System.out.println("Please enter text of magazine: ");
                 pptext = br.readLine();
-                System.out.println("Please enter date of issue: "); // doi and dop is the same (assumption)
+                System.out.println("Please enter date of issue: ");
                 dop = br.readLine();
                 System.out.println("Please enter URL: ");
                 url = br.readLine();
@@ -309,10 +302,10 @@ public class WolfPub {
                 System.out.println("\nPlease enter new title of the publication:");
                 title = br.readLine();
                 System.out.println("Please enter new name of editor: ");
-                editor = br.readLine();                                                        // editor's name"??
+                editor = br.readLine();
                 System.out.println("Please enter new periodicity: ");
                 periodicity = br.readLine();
-                System.out.println("Please enter new text of magazine: "); //integer or string?
+                System.out.println("Please enter new text of magazine: ");
                 pptext = br.readLine();
                 System.out.println("Please enter new URL: ");
                 url = br.readLine();
@@ -357,9 +350,9 @@ public class WolfPub {
                 printResult(stat);
                 System.out.println("\nPlease enter new title of the publication:");
                 title = br.readLine();
-                System.out.println("Please enter new name of editor: "); //maybe we add here command "press "/" if you don't
-                editor = br.readLine();                                                        // editor's name"??
-                System.out.println("Please enter ISBN number: "); //integer or string?
+                System.out.println("Please enter new name of editor: ");
+                editor = br.readLine();
+                System.out.println("Please enter ISBN number: ");
                 ISBN = br.readLine();
                 System.out.println("Please enter new edition: ");
                 edition = br.readLine();
@@ -444,62 +437,166 @@ public class WolfPub {
             System.out.println("There was an error: " + e.getMessage());
         }
     }
+    /**
+     * Assigning editor(s) to publication
+     * This function has TRANSACTIONS
+     */
 
-    public static void updatePublicationInfo() {
-        //Asks user to enter new information about Publication
+    public static void assignEditor() {
+
         try {
-            String pid, ISBN, edition;
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
+            String pid, sid;
+
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Please enter publication ID:");
+            System.out.println("Please enter publication ID of the publication :");
             pid = br.readLine();
-            System.out.println("Please choose type of publication: " +
-                    "\n1. Book\n" +
-                    "\n2. Magazine\n" +
-                    "\n3. Journal\n" +
-                    "\n4. Article\n");
-            ptype = br.readLine();
+            System.out.println("Please enter editor's staff_id :");
+            sid = br.readLine();
 
-            if (ptype = 1) {
-                System.out.println("Please enter new name of editor: "); //maybe we add here command "press "/" if you don't
-                editor = br.readLine();                                                        // editor's name"??
-                System.out.println("Please enter new topic of the publication: ");  // the same with topic cause we allow NULLs there
-                topics = br.readLine();
-                System.out.println("Please enter new name of author: "); /*When user chooses 1, new book has to be inserted into Publications
-                                                                                and BOOKS tables*/
-                author = br.readLine();
-                System.out.println("Please enter ISBN number: "); //integer or string?
-                ISBN = br.readLine();
-                System.out.println("Please enter new edition: ");
-                edition = br.readLine();
-                System.out.println("Please enter new publication date: ");
-                dop = br.readLine();
-                System.out.println("Please enter new URL: ");
-                url = br.readLine();
-                System.out.println("Please enter new price: ");
-                price = br.readLine();
+            try {
+                connection.setAutoCommit(false);
+                String assign = "INSERT INTO edit (pid, sid) VALUES(?,?)";
+                PreparedStatement preparedStatement = connection.prepareStatement(assign);
+                preparedStatement.setString(1, pid);
+                preparedStatement.setString(2, sid);
+                preparedStatement.executeUpdate();
 
-                try {
-                    connection.setAutoCommit(false); //set autocommit false
-                    statement.executeUpdate("UPDATE Publications SET title = '%s', ptype = book, topics = '%s', " +
-                            "editor= '%s', dop = '%s', url = '%s', price= '%s') WHERE pid = = '%s'", title, topics, editor, dop, url, price, pid);
-                    statement.executeUpdate("UPDATE BOOKS SET ISBN = '%s', edition = '%s' WHERE pid = '%s')", ISBN, edition, pid);
-                    connection.commit(); //commits the transaction to the database if no error has been detected
-                    System.out.println("\nTransaction Success!!");
-                } catch (SQLException sqlE) // the SQL was malformed
-                {
-                    //If error is found, the transaction is rolled back and the table is returned to its previous state
-                    System.out.print("Transaction is being rolled back.  An Error Occurred: ");
-                    System.out.println(sqlE.getMessage()); // print SQL error message
-                    connection.rollback(); //rollback transaction
-                    connection.setAutoCommit(true); //reset autocommit to true
+                connection.commit(); //commits the transaction to the database if no error has been detected
+                System.out.println( "\nTransaction Success!!" );
+            }
+            catch (SQLException sqlE) // the SQL was malformed
+            {
+                //If error is found, the transaction is rolled back and the table is returned to its previous state
+                System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
+                System.out.println( sqlE.getMessage() ); // print SQL error message
+                connection.rollback(); //rollback transaction
+                connection.setAutoCommit(true); //reset autocommit to true
+            }
+
+
+        }
+
+        catch (Exception e) {
+            System.out.println("There is an error: " + e.getMessage());
+        }
+
+
+    }
+    /**
+     * This function shows information to editor(s) on publications
+     * he/she responsible for
+     * This function has TRANSACTIONS
+     */
+
+    public static void showPublicationEditor() {
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
+            String sid;
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Please enter staff_id :");
+            sid = br.readLine();
+
+            try {
+                connection.setAutoCommit(false);
+                String stmt = "SELECT * FROM publications NATURAL JOIN edit WHERE sid = ?" ;
+                PreparedStatement prepared = connection.prepareStatement(stmt);
+                prepared.setString(1, sid);
+
+                ResultSet rsp = prepared.executeQuery();
+                ResultSetMetaData md = rsp.getMetaData();
+                rsp.next();
+                if (rsp.getString("ptype").equals("journal")||
+                        rsp.getString("ptype").equals("magazine")) {
+                    String statement = "SELECT pid, ptype, title, editor, periodicity, pptext, doi, topic"
+                            + " FROM publications NATURAL JOIN edit NATURAL JOIN periodicpublication"
+                            + " NATURAL JOIN issue NATURAL JOIN hastopic WHERE sid = ?" ;
+                    PreparedStatement prepareds = connection.prepareStatement(statement);
+                    prepareds.setString(1, sid);
+                    prepareds.executeQuery();
+                    printResult(prepareds);
+
+                }
+                if (rsp.getString("ptype").equals("book")) {
+                    String statement = "SELECT pid, ptype, title, editor, topic, edition, ISBN, dop"
+                            + " FROM publications NATURAL JOIN edit NATURAL JOIN books"
+                            + " NATURAL JOIN hastopic WHERE sid = ?" ;
+                    PreparedStatement prepareds = connection.prepareStatement(statement);
+                    prepareds.setString(1, sid);
+                    prepareds.executeQuery();
+                    printResult(prepareds);
+
                 }
 
+
+
+                connection.commit(); //commits the transaction to the database if no error has been detected
+                System.out.println( "\nTransaction Success!!" );
+            }
+            catch (SQLException sqlE) // the SQL was malformed
+            {
+                //If error is found, the transaction is rolled back and the table is returned to its previous state
+                System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
+                System.out.println( sqlE.getMessage() ); // print SQL error message
+                connection.rollback(); //rollback transaction
+                connection.setAutoCommit(true); //reset autocommit to true
             }
 
         }
-        //catches any errors that may occur and quits
+
         catch (Exception e) {
-            System.out.println("There was an error: " + e.getMessage());
+            System.out.println("There is an error: " + e.getMessage());
+        }
+    }
+    /**
+     * Entering new Article
+     * This function contains TRANSACTIONS
+     */
+
+    public static void enterArticle() {
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(url, uname, pass);
+            String atitle, atext, url;
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Please enter title of article :");
+            atitle = br.readLine();
+            System.out.println("Please enter text of article :");
+            atext = br.readLine();
+            System.out.println("Please enter url of article :");
+            url = br.readLine();
+            try{
+                connection.setAutoCommit(false); //set autocommit false
+
+                String artIns = "INSERT INTO Articles(atitle, atext, url) "
+                        + "VALUES(?,?,?)";
+
+                PreparedStatement preparedStatement = connection.prepareStatement(artIns);
+                preparedStatement.setString(1, atitle);
+                preparedStatement.setString(2, atext);
+                preparedStatement.setString(3, url);
+                preparedStatement.executeUpdate(); //insert new article
+
+                connection.commit(); //commits the transaction to the database if no error has been detected
+                System.out.println( "\nTransaction Success!!" );
+            }
+            catch (SQLException sqlE) // the SQL was malformed
+            {
+                //If error is found, the transaction is rolled back and the table is returned to its previous state
+                System.out.print( "Transaction is being rolled back.  An Error Occurred: " );
+                System.out.println( sqlE.getMessage() ); // print SQL error message
+                connection.rollback(); //rollback transaction
+                connection.setAutoCommit(true); //reset autocommit to true
+            }
+        }
+
+        catch (Exception e) {
+            System.out.println("There is an error: " + e.getMessage());
         }
     }
 
@@ -1209,8 +1306,94 @@ public class WolfPub {
      * Report generation
      */
     public void getCopiesSoldByDistributor() {
-        Statement stmt = this.con.createStatement();
+        final String query = "SELECT did, dname, MONTHNAME(odate), YEAR(odate) " +
+                "FROM Distributors NATURAL JOIN MakeOrder NATURAL JOIN Orders " +
+                "GROUP BY did, MONTHNAME(odate), YEAR(odate);";
 
+        runStatement(query);
     }
 
+    public void getTotalPriceByDistributor() {
+        final String query = "WITH Prices AS (" +
+                "SELECT did, ROUND(price * copies + shcost, 2) AS Price, MONTHNAME(odate) AS month, YEAR(odate) AS year " +
+                "FROM MakeOrder NATURAL JOIN Orders) " +
+                "SELECT did, month, year, SUM(price) AS cost " +
+                "FROM Prices GROUP BY did, month, year ORDER BY did;";
+
+        runStatement(query);
+    }
+
+    public void getTotalRevenue() {
+        final String query = "WITH Prices AS (" +
+                "SELECT did, ROUND(price * copies + shcost, 2) AS Price " +
+                "FROM Orders) " +
+                "SELECT ROUND(SUM(price), 2) AS Revenue  " +
+                "FROM Prices;";
+
+        runStatement(query);
+    }
+
+    public void getTotalExpenses() {
+        final String query = "WITH Costs AS (" +
+                "SELECT shcost AS cost " +
+                "FROM Orders) UNION ALL (" +
+                "SELECT pay AS cost " +
+                "FROM Staff " +
+                "WHERE periodicity = -1) UNION ALL (" +
+                "SELECT pay * (DATEDIFF(NOW(), sdate) / periodicity) AS cost " +
+                "FROM Staff " +
+                "WHERE periodicity <> -1)) " +
+                "SELECT ROUND(SUM(cost), 2) AS TotalCost FROM Costs;";
+
+        runStatement(query);
+    }
+
+    public void getDistributorCount() {
+        final String query = "SELECT COUNT(*) FROM Distributors;";
+
+        runStatement(query);
+    }
+
+    public void getRevenueByCity() {
+        final String query = "WITH Prices AS (" +
+                "SELECT ROUND(price * copies + shcost, 2) AS price, city " +
+                "FROM MakeOrder NATURAL JOIN Orders NATURAL JOIN Distributors) " +
+                "SELECT city, SUM(price) AS cost " +
+                "FROM Prices GROUP BY city;";
+
+        runStatement(query);
+    }
+
+    public void getRevenueByDistributor() {
+        final String query = "WITH Prices AS (" +
+                "SELECT ROUND(price * copies + shcost, 2) AS price, dname " +
+                "FROM MakeOrder NATURAL JOIN Orders NATURAL JOIN Distributors) " +
+                "SELECT dname, SUM(price) AS cost " +
+                "FROM Prices GROUP BY dname;";
+
+        runStatement(query);
+    }
+
+    public void getRevenueByLocation() {
+        final String query = "WITH Prices AS (" +
+                "SELECT ROUND(price * copies + shcost, 2) AS price, address " +
+                "FROM MakeOrder NATURAL JOIN Orders NATURAL JOIN Distributors) " +
+                "SELECT address, SUM(price) AS cost " +
+                "FROM Prices GROUP BY address;";
+
+        runStatement(query);
+    }
+
+    public void getTotalPayByStaffType() {
+        final String query = "WITH Costs AS (" +
+                "SELECT stype, pay AS cost " +
+                "FROM Staff " +
+                "WHERE periodicity = -1) UNION ALL (" +
+                "SELECT stype, pay * (DATEDIFF(NOW(), sdate) / periodicity) AS cost " +
+                "FROM Staff " +
+                "WHERE periodicity <> -1)) " +
+                "SELECT stype, ROUND(SUM(cost), 2) AS pay FROM Costs GROUP BY stype;";
+
+        runStatement(query);
+    }
 }
