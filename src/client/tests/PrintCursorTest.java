@@ -9,7 +9,7 @@ public class PrintCursorTest {
                 Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/setup?serverTimezone=UTC", "root", "password");
 
                 Statement statement = con.createStatement();
-                ResultSet rs = statement.executeQuery("SELECT * FROM Staff");
+                ResultSet rs = statement.executeQuery("SELECT sid FROM Staff");
 
                 PrintCursor printer = new PrintCursor(rs);
                 return printer.print();

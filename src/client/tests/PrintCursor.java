@@ -26,7 +26,7 @@ public class PrintCursor {
             System.out.println();
 
             while (this.results.next()) {
-                for (int i = 1; i < colCount; i++) {
+                for (int i = 1; i <= colCount; i++) {
                     displaySize = min(meta.getColumnDisplaySize(i), 20);
                     String format = "%" + String.valueOf(displaySize) + "s";
                     System.out.printf(format, this.results.getString(meta.getColumnLabel(i)) + "\t\t");

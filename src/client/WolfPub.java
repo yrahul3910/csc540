@@ -1107,6 +1107,10 @@ public class WolfPub {
     /**
      * Report generation
      */
+
+    /**
+     * Returns the number of copies sold by each distributor.
+     */
     public void getCopiesSoldByDistributor() {
         final String query = "SELECT did, dname, MONTHNAME(odate), YEAR(odate) " +
                 "FROM Distributors NATURAL JOIN MakeOrder NATURAL JOIN Orders " +
@@ -1115,6 +1119,9 @@ public class WolfPub {
         runStatement(false, query);
     }
 
+    /**
+     * Returns the total price of orders made by each distributor
+     */
     public void getTotalPriceByDistributor() {
         final String query = "WITH Prices AS (" +
                 "SELECT did, ROUND(price * copies + shcost, 2) AS Price, MONTHNAME(odate) AS month, YEAR(odate) AS year " +
@@ -1125,6 +1132,9 @@ public class WolfPub {
         runStatement(false, query);
     }
 
+    /**
+     * Returns the total revenue of the publishing house
+     */
     public void getTotalRevenue() {
         final String query = "WITH Prices AS (" +
                 "SELECT did, ROUND(price * copies + shcost, 2) AS Price " +
@@ -1135,6 +1145,9 @@ public class WolfPub {
         runStatement(false, query);
     }
 
+    /**
+     * Returns the total expenses of the publishing house
+     */
     public void getTotalExpenses() {
         final String query = "WITH Costs AS ((\n" +
                 "    SELECT shcost AS cost \n" +
@@ -1147,12 +1160,18 @@ public class WolfPub {
         runStatement(false, query);
     }
 
+    /**
+     * Returns the number of distributors
+     */
     public void getDistributorCount() {
         final String query = "SELECT COUNT(*) FROM Distributors;";
 
         runStatement(false, query);
     }
 
+    /**
+     * Returns the revenue of the publishing house by city
+     */
     public void getRevenueByCity() {
         final String query = "WITH Prices AS (" +
                 "SELECT ROUND(price * copies + shcost, 2) AS price, city " +
@@ -1163,6 +1182,9 @@ public class WolfPub {
         runStatement(false, query);
     }
 
+    /**
+     * Returns the revenue of the publishing house by distributor
+     */
     public void getRevenueByDistributor() {
         final String query = "WITH Prices AS (" +
                 "SELECT ROUND(price * copies + shcost, 2) AS price, dname " +
@@ -1173,6 +1195,9 @@ public class WolfPub {
         runStatement(false, query);
     }
 
+    /**
+     * Returns the revenue of the publishing house by location
+     */
     public void getRevenueByLocation() {
         final String query = "WITH Prices AS (" +
                 "SELECT ROUND(price * copies + shcost, 2) AS price, address " +
@@ -1183,6 +1208,9 @@ public class WolfPub {
         runStatement(false, query);
     }
 
+    /**
+     * Returns the revenue of the publishing house by staff type
+     */
     public void getTotalPayByStaffType() {
         final String query = "SELECT stype, SUM(paycheck)\n" +
                 "FROM Staff\n" +
