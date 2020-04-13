@@ -17,7 +17,7 @@ public class PrintCursor {
             int colCount = meta.getColumnCount();
             int displaySize = 0;
 
-            for (int i = 1; i < colCount; i++) {
+            for (int i = 1; i <= colCount; i++) {
                 String column = meta.getColumnLabel(i);
                 displaySize = min(meta.getColumnDisplaySize(i), 20);
                 String format = "%" + String.valueOf(displaySize) + "s";
