@@ -89,19 +89,20 @@ class ProductionMenu extends Menu {
 
         switch (option) {
             case 1:
-                // TODO
+                runner.enterPublicationInfo();
                 break;
             case 2:
                 runner.enterIssue();
                 break;
             case 3:
-                // TODO
+                runner.updatePublication();
                 break;
             case 4:
                 runner.updateIssue();
                 break;
             case 5:
                 // TODO
+
                 break;
             case 6:
                 runner.deleteIssue();
@@ -122,7 +123,7 @@ class ProductionMenu extends Menu {
                 runner.updateArticleDate();
                 break;
             case 12:
-                // TODO
+                runner.updateChapterTitle();
                 break;
             case 13:
                 runner.findBooksByTopic();
@@ -146,7 +147,7 @@ class ProductionMenu extends Menu {
                 runner.enterEmployeePayment();
                 break;
             case 20:
-                // TODO
+                runner.employeePaymentDates();
                 break;
         }
 
@@ -166,10 +167,10 @@ class DistributionMenu extends Menu {
 
         switch (option) {
             case 1:
-                runner.enterDistributorInfo();
+                // TODO
                 break;
             case 2:
-                runner.updateDistributorInfo();
+                // TODO
                 break;
             case 3:
                 // TODO
