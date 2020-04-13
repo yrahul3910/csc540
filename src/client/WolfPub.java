@@ -481,7 +481,7 @@ public class WolfPub {
      * Adding chapter for books
      * This function contains TRANSACTIONS
      */
-    public void addchapter() {
+    public void addChapter() {
         String pid, chno, chtitle, chtext, url;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
