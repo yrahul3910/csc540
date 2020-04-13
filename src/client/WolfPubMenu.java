@@ -77,13 +77,77 @@ class ProductionMenu extends Menu {
     public int display() {
         System.out.println("1. Enter a new book edition\n2. Enter new publication issue\n3. Update a book edition\n" +
                 "4. Update a publication issue\n5. Delete a book edition\n6. Delete a publication issue\n" +
-                "7. Enter an article\n8. Enter a chapter\n9. Update article\n10. Update chapter\n" +
-                "11. Enter article text\n12. Update article text\n13. Find book by topic\n14. Find book by date\n" +
+                "7. Enter an article\n8. Enter a chapter\n9. Update article text\n10. Update article author\n" +
+                "11. Update article date\n12. Update chapter\n" +
+                "13. Find book by topic\n14. Find book by date\n" +
                 "15. Find book by author\n16. Find articles by topic\n17. Find articles by date\n" +
                 "18. Find articles by author\n19. Enter payment for staff\n20. Find payment claim date for staff\n");
 
         int option = new Scanner(System.in).nextInt();
         checkBadThingsHappen(option, 20);
+
+        switch (option) {
+            case 1:
+                // TODO
+                break;
+            case 2:
+                runner.enterIssue();
+                break;
+            case 3:
+                // TODO
+                break;
+            case 4:
+                runner.updateIssue();
+                break;
+            case 5:
+                // TODO
+                break;
+            case 6:
+                runner.deleteIssue();
+                break;
+            case 7:
+                runner.addArticle();
+                break;
+            case 8:
+                runner.addChapter();
+                break;
+            case 9:
+                runner.updateArticleText();
+                break;
+            case 10:
+                runner.updateArticleAuthor();
+                break;
+            case 11:
+                runner.updateArticleDate();
+                break;
+            case 12:
+                // TODO
+                break;
+            case 13:
+                runner.findBooksByTopic();
+                break;
+            case 14:
+                runner.findBooksByDate();
+                break;
+            case 15:
+                runner.findBooksByAuthor();
+                break;
+            case 16:
+                runner.findArticleByTopic();
+                break;
+            case 17:
+                runner.findArticleByDate();
+                break;
+            case 18:
+                runner.findArticleByAuthor();
+                break;
+            case 19:
+                runner.enterEmployeePayment();
+                break;
+            case 20:
+                // TODO
+                break;
+        }
 
         return 0;
     }
