@@ -195,6 +195,46 @@ class DistributionMenu extends Menu {
 class ReportsMenu extends Menu {
     @Override
     public int display() {
+        System.out.print("1. Get total copies bought per distributor\n2. Get total price of copies bought per distributor\n" +
+                "3. Get total revenue of publishing house\n4. Get total expenses\n5. Get number of distributors\n" +
+                "6. Get total revenue per city\n7. Get total revenue per distributor\n8. Get total revenue per location\n" +
+                "9. Get total payments to authors and editors\nEnter an option: ");
+
+        int option = new Scanner(System.in).nextInt();
+        checkBadThingsHappen(option, 9);
+
+        switch (option) {
+            case 1:
+                runner.getCopiesSoldByDistributor();
+                break;
+            case 2:
+                runner.getTotalPriceByDistributor();
+                break;
+            case 3:
+                runner.getTotalRevenue();
+                break;
+            case 4:
+                runner.getTotalExpenses();
+                break;
+            case 5:
+                runner.getDistributorCount();
+                break;
+            case 6:
+                runner.getRevenueByCity();
+                break;
+            case 7:
+                runner.getRevenueByDistributor();
+                break;
+            case 8:
+                runner.getRevenueByLocation();
+                break;
+            case 9:
+                runner.getTotalPayByStaffType();
+                break;
+            case 10:
+                break;
+        }
+
         return 0;
     }
 }
