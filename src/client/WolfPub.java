@@ -943,8 +943,7 @@ public class WolfPub {
         }
 
     }
-
-/*************************************need to update the rest******************************/
+    
     /**
      * Adding new author to the book chapter
      */
