@@ -75,13 +75,14 @@ class EditingMenu extends Menu {
 class ProductionMenu extends Menu {
     @Override
     public int display() {
-        System.out.println("1. Enter a new book edition\n2. Enter new publication issue\n3. Update a book edition\n" +
+        System.out.print("1. Enter a new book edition\n2. Enter new publication issue\n3. Update a book edition\n" +
                 "4. Update a publication issue\n5. Delete a book edition\n6. Delete a publication issue\n" +
                 "7. Enter an article\n8. Enter a chapter\n9. Update article text\n10. Update article author\n" +
                 "11. Update article date\n12. Update chapter\n" +
                 "13. Find book by topic\n14. Find book by date\n" +
                 "15. Find book by author\n16. Find articles by topic\n17. Find articles by date\n" +
-                "18. Find articles by author\n19. Enter payment for staff\n20. Find payment claim date for staff\n");
+                "18. Find articles by author\n19. Enter payment for staff\n20. Find payment claim date for staff\n"+
+                "Enter an option: ");
 
         int option = new Scanner(System.in).nextInt();
         checkBadThingsHappen(option, 20);
@@ -156,6 +157,37 @@ class ProductionMenu extends Menu {
 class DistributionMenu extends Menu {
     @Override
     public int display() {
+        System.out.print("1. Enter new distributor\n2. Update distributor information\n3. Delete distributor\n" +
+                "4. Input orders from distributors for book\n5. Input orders for issue\n6. Bill distributor\n" +
+                "7. Change outstanding balance on payment\nEnter an option: ");
+
+        int option = new Scanner(System.in).nextInt();
+        checkBadThingsHappen(option, 7);
+
+        switch (option) {
+            case 1:
+                runner.enterDistributorInfo();
+                break;
+            case 2:
+                runner.updateDistributorInfo();
+                break;
+            case 3:
+                // TODO
+                break;
+            case 4:
+                // TODO
+                break;
+            case 5:
+                // TODO
+                break;
+            case 6:
+                // TODO
+                break;
+            case 7:
+                // TODO
+                break;
+        }
+
         return 0;
     }
 }
