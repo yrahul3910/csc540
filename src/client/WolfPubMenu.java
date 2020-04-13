@@ -1,6 +1,11 @@
 import java.util.Scanner;
 
 abstract class Menu {
+    WolfPub runner;
+
+    public Menu() {
+        runner = new WolfPub("jdbc:mysql://localhost:3306/setup?serverTimezone=UTC", "root", "password");
+    }
     public abstract int display();
 }
 
@@ -23,7 +28,7 @@ class MainMenu extends Menu {
 class EditingMenu extends Menu {
     @Override
     public int display() {
-
+        runner.updateIssue();
 
         return 0;
     }
@@ -32,6 +37,8 @@ class EditingMenu extends Menu {
 class ProductionMenu extends Menu {
     @Override
     public int display() {
+
+
         return 0;
     }
 }
