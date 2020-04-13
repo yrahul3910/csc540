@@ -308,6 +308,29 @@ public class WolfPub {
             System.out.println("There is an error: " + e.getMessage());
         }
     }
+    /**
+     * Delete publication
+     * This function has TRANSACTIONS
+     */
+
+    public static void deletePublication() {
+        String pid;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Please enter publication ID of the book:");
+            pid = br.readLine();
+
+            this.con.setAutoCommit(false); //set autocommit false
+
+            String prepareds = "DELETE FROM publications WHERE pid = ? ";
+            runPreparedStatement(true, prepareds, pid);
+
+            this.con.commit(); //commits the transaction to the database if no error has been detected
+        }
+        catch (Exception e) {
+            System.out.println("There is an error: " + e.getMessage());
+        }
+    }
 
     /**
      * Assigning editor(s) to publication
