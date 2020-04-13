@@ -60,6 +60,14 @@ public class WolfPub {
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
+
+            try {
+                if (!this.con.getAutoCommit())
+                    this.con.rollback();
+            } catch (SQLException e) {
+                System.out.println("All hope has evaded us. We could not even successfully rollback :(");
+                System.out.println(e.getMessage());
+            }
         }
     }
 
@@ -125,7 +133,7 @@ public class WolfPub {
                 String bookIns = "INSERT INTO BOOKS (pid, ISBN, edition, dop)"
                         + "VALUES((SELECT pid FROM Publications WHERE title = ? AND ptype = ? ), ?, ?, ?)";
 
-                runPreparedStatement(true, bookIns, pid, ISBN, edition, dop);
+                runPreparedStatement(true, bookIns, ISBN, edition, dop);
                 
                 this.con.commit(); //commits the transaction to the database if no error has been detected
                 System.out.println( "\nTransaction Success!!" );
@@ -187,7 +195,7 @@ public class WolfPub {
 
                 String jourIns = "INSERT INTO periodicpublication( pid, periodicity, pptype, pptext) "
                         + "VALUES((SELECT pid FROM Publications WHERE title = ? AND ptype = ? ),?,?,?)";
-                PreparedStatement preparedStat = this.conprepareStatement(jourIns);
+                PreparedStatement preparedStat = this.con.prepareStatement(jourIns);
                 preparedStat.setString(1, title);
                 preparedStat.setString(2, "journal");
                 preparedStat.setString(3, periodicity);
@@ -347,7 +355,7 @@ public class WolfPub {
             try {
                 this.con.setAutoCommit(false);
                 String stmt = "SELECT * FROM publications NATURAL JOIN edit WHERE sid = ?" ;
-                PreparedStatement prepared = connection.prepareStatement(stmt);
+                PreparedStatement prepared = this.con.prepareStatement(stmt);
                 prepared.setString(1, sid);
 
                 ResultSet rsp = prepared.executeQuery();
@@ -358,7 +366,7 @@ public class WolfPub {
                     String statement = "SELECT pid, ptype, title, editor, periodicity, pptext, doi, topic"
                             + " FROM publications NATURAL JOIN edit NATURAL JOIN periodicpublication"
                             + " NATURAL JOIN issue NATURAL JOIN hastopic WHERE sid = ?" ;
-                    PreparedStatement prepareds = connection.prepareStatement(statement);
+                    PreparedStatement prepareds = this.con.prepareStatement(statement);
                     prepareds.setString(1, sid);
                     prepareds.executeQuery();
 
@@ -369,7 +377,7 @@ public class WolfPub {
                     String statement = "SELECT pid, ptype, title, editor, topic, edition, ISBN, dop"
                             + " FROM publications NATURAL JOIN edit NATURAL JOIN books"
                             + " NATURAL JOIN hastopic WHERE sid = ?" ;
-                    PreparedStatement prepareds = connection.prepareStatement(statement);
+                    PreparedStatement prepareds = this.con.prepareStatement(statement);
                     prepareds.setString(1, sid);
                     prepareds.executeQuery();
 
@@ -398,7 +406,7 @@ public class WolfPub {
      * This function contains TRANSACTIONS
      */
 
-    public static void enterArticle() {
+    public void enterArticle() {
         String atitle, atext, url;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -538,40 +546,6 @@ public class WolfPub {
 
 //********************************** PRODUCTION ***********************************************************
 
-    public void updateBookInfo() {
-        //Asks user to enter new information about Book
-        try {
-            String pid, ISBN, edition;
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Please enter the ISBN of the book you want to update: ");
-            System.out.println("Please enter publication ID:");
-            pid = br.readLine();
-            System.out.println("Please enter the ISBN of the book you want to update:");
-            ISBN = br.readLine();
-            System.out.println("Please enter the new edition of the Book: ");
-            edition = br.readLine();
-
-            try {
-                this.con.setAutoCommit(false); //set autocommit to false
-                statement.executeUpdate(String.format("UPDATE BOOKS SET ISBN='%s', edition ='%s' WHERE pid = '%s' ", ISBN, edition, pid));
-                this.con.commit(); //if there is no error commit the transaction
-                System.out.println("\nTransaction Success!"); //print success message
-            } catch (SQLException sqlE) {
-                //If error is found, the transaction is rolled back and the table is returned to its previous state
-                System.out.print("Transaction is being rolled back.  An Error Occurred: ");
-                System.out.println(sqlE); //print the error message
-                this.con.rollback(); //rollback the transaction
-                this.con.setAutoCommit(true); //set autocommit to true
-            }
-
-        }
-        //catches any errors that may occur and quits
-        catch (Exception e) {
-            System.out.println("There was an error: " + e.getMessage());
-        }
-    }
-
-
     /**
      * Enter new Issue of Periodic Publication
      * This function includes TRANSACTION
@@ -685,7 +659,7 @@ public class WolfPub {
      * Update Chapter's title
      * This function includes TRANSACTION
      */
-    public void UpdateChapterTitle() {
+    public void updateChapterTitle() {
         String pid, chno, chtitle;
 
         try {
@@ -897,12 +871,12 @@ public class WolfPub {
             System.out.println("Please enter staff ID of the author you want to add: ");
             sid = br.readLine();
 
-            connection.setAutoCommit(false);
+            this.con.setAutoCommit(false);
             String articleAuthor = "INSERT INTO WriteArticle (aid, sid) VALUES (?,?);";
 
             runPreparedStatement(true, articleAuthor, aid, sid);
 
-            connection.commit();
+            this.con.commit();
             System.out.println("\nTransaction Success!");
 
         } catch (Exception e) {
@@ -931,11 +905,11 @@ public class WolfPub {
             System.out.println("Please enter staff ID of the author you want to add: ");
             sidnew = br.readLine();
 
-            connection.setAutoCommit(false);
+            this.con.setAutoCommit(false);
             String articleAuthor = "UPDATE WriteArticle SET sid = ? WHERE aid = ? and sid = ?;";
             runPreparedStatement(true, articleAuthor, sidnew, aid, sidold);
 
-            connection.commit();
+            this.con.commit();
             System.out.println("\nTransaction Success!");
 
         } catch (Exception e) {
@@ -963,11 +937,11 @@ public class WolfPub {
             System.out.println("Please enter staff ID of the author you want to add: ");
             sid = br.readLine();
 
-            connection.setAutoCommit(false);
+            this.con.setAutoCommit(false);
             String bookAuthor = "INSERT INTO WriteBook (pid, sid) VALUES (?,?);";
-            runPreparedStatement(true, bookAuthor, pid sid);
+            runPreparedStatement(true, bookAuthor, pid, sid);
 
-            connection.commit();
+            this.con.commit();
             System.out.println("\nTransaction Success!");
 
         } catch (Exception e) {
@@ -995,11 +969,11 @@ public class WolfPub {
             System.out.println("Please enter staff ID of the author you want to delete: ");
             sid = br.readLine();
 
-            connection.setAutoCommit(false);
+            this.con.setAutoCommit(false);
             String bookAuthor = "DELETE FROM WriteBook WHERE pid = ? and sid = ?;";
             runPreparedStatement(true, bookAuthor, pid, sid);
 
-            connection.commit();
+            this.con.commit();
             System.out.println("\nTransaction Success!");
 
         } catch (Exception e) {
@@ -1025,12 +999,12 @@ public class WolfPub {
             System.out.println("\nPlease enter new date of creation of the article: ");
             doc = br.readLine();
 
-            connection.setAutoCommit(false);
+            this.con.setAutoCommit(false);
             String articleUpd = "UPDATE Articles SET doc = ? WHERE aid = ?;";
 
             runPreparedStatement(true, doc, aid);
 
-            connection.commit();
+            this.con.commit();
             System.out.println("\nTransaction Success!");
 
         } catch (Exception e) {
@@ -1056,11 +1030,11 @@ public class WolfPub {
             System.out.println("\nPlease enter new text of the article: ");
             atext = br.readLine();
 
-            connection.setAutoCommit(false);
+            this.con.setAutoCommit(false);
             String articleUpd = "UPDATE Articles SET atext = ? WHERE aid = ?;";
             runPreparedStatement(true, articleUpd, atext, aid);
 
-            connection.commit();
+            this.con.commit();
             System.out.println("\nTransaction Success!");
 
         } catch (Exception e) {
@@ -1088,11 +1062,11 @@ public class WolfPub {
             System.out.println("Please enter date of payment: ");
             paydate = br.readLine();
 
-            connection.setAutoCommit(false);
+            this.con.setAutoCommit(false);
             String issueIns = "INSERT INTO Payments (sid, paycheck, paydate) VALUES (?,?,?);";
             runPreparedStatement(true, issueIns, sid, paycheck, paydate);
 
-            connection.commit();
+            this.con.commit();
             System.out.println("\nTransaction Success!");
 
         } catch (Exception e) {
@@ -1112,188 +1086,18 @@ public class WolfPub {
             System.out.println("Please enter staff ID: ");
             sid = br.readLine();
 
-            connection.setAutoCommit(false);
+            this.con.setAutoCommit(false);
             String empPay = "SELECT payid, paycheck, paydate FROM Staff\n" +
                     "NATURAL JOIN Payments WHERE sid = ?;";
             runPreparedStatement(false, empPay, sid);
 
-            connection.commit();
+            this.con.commit();
             System.out.println("\nTransaction Success!");
         } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());
         }
     }
 
-
-    /**
-     *
-     */
-    public void enterDistributorInfo() {
-        //Insert new tuples into Distributors table
-        try {
-            String dname, dtype, city, address, contact, phno, tot_balance;
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Please enter the distributor's name:");
-            dname = br.readLine();
-            System.out.println("Please enter the distributor's type (wholesale/bookstore/library):");
-            dtype = br.readLine();
-            System.out.println("Please enter the distributor's city:");
-            city = br.readLine();
-            System.out.println("Please enter the distributor's address:");
-            address = br.readLine();
-            System.out.println("Please enter the distributor's contact (full name):");
-            contact = br.readLine();
-            System.out.println("Please enter the distributor's phone number (111-111-1111):");
-            phno = br.readLine();
-            System.out.println("Please enter the distributor's total balance:");
-            tot_balance = br.readLine();
-
-            try {
-                this.con.setAutoCommit(false); //set autocommit to false
-                statement.executeUpdate("INSERT INTO Distributors(dname, dtype, city, address, contact, phno, tot_balance) " +
-                        "VALUES (" + "'" + dname + "' ,'" + dtype + "', '" + city + "', "
-                        + address + ", '" + contact + "', '" + phno + "', " + tot_balance + "');"); //insert a tuple into the distributors' table
-                this.con.commit(); //commit the transaction if there is no error
-                System.out.println("\nTransaction Success!");
-            } catch (SQLException sqlE) {
-                System.out.print("An error occurred: ");
-                System.out.println(sqlE); //print the error message
-                this.con.rollback(); //rollback the transaction
-                this.con.setAutoCommit(true); //set autocommit to true
-            }
-
-        } catch (Exception e) {
-            System.out.println("There is an error: " + e.getMessage());
-        }
-
-
-    }
-
-    public void updateDistributorInfo() {
-        try {
-            String did, dname, dtype, city, address, contact, phno, tot_balance;
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            System.out.println("Please enter the distributor ID you want to update:");
-            did = br.readLine();
-
-            System.out.println("Please enter the new distributor's name:");
-            dname = br.readLine();
-            System.out.println("Please enter the new type of the distributor (wholesale/bookstore/library):");
-            dtype = br.readLine();
-            System.out.println("Please enter the new city of the distributor:");
-            city = br.readLine();
-            System.out.println("Please enter the new address of the distributor:");
-            address = br.readLine();
-            System.out.println("Please enter the new contact of the distributor (full name):");
-            contact = br.readLine();
-            System.out.println("Please enter the distributor's new phone number (111-111-1111):");
-            phno = br.readLine();
-            System.out.println("Please enter the distributor's total balance:");
-            tot_balance = br.readLine();
-
-            try {
-                this.con.setAutoCommit(false); //set autocommit to false
-                statement.executeUpdate(String.format("UPDATE Distributors SET dname='%s', dtype='%s', city='%s', address=%s, contact='%s', phno='%s', tot_balance=%s WHERE did=%s",
-                        +dname, dtype, city, address, contact, phno, tot_balance, did));
-                this.con.commit(); //commit the transaction if there is no error
-                System.out.println("\nTransaction Success!"); //print success message
-            } catch (SQLException sqlE) {
-                // If there is an error, the transaction is rolled back, so that the table is returned to the previous state
-                System.out.print("An error occurred: ");
-                System.out.println(sqlE); //print the error message
-                this.con.rollback(); //rollback the transaction
-                this.con.setAutoCommit(true); //set autocommit to true
-            }
-
-        } catch (Exception e) {
-            System.out.println("There is an error: " + e.getMessage());
-        }
-
-    }
-
-
-    public void mainsd(String[] args) {
-        int action = -1;
-        int staffAction = -1;
-        //Initializes the entire database. Creates the appropriate tables, sequences, inserts, etc...
-        initialize();
-
-        //While the staff action isn't to quit the program do the following:
-        while (action != 9) {
-            action = WolfPubMenu.loginMenu();
-
-            System.out.println("The choice is " + action);
-            //if the manager is logged in, do the following:
-            if (action == 1111) {
-                //Manager logged in
-                //While the Manager doesn't want to log out do the following
-                while (staffAction != 8) {
-                    staffAction = WolfPubMenu.menuManager();
-                    //if action is 0 show all the books present
-                    if (staffAction == 0) {
-                        showAllBooks();
-                    }
-                    //if action is 8 show all the staff
-                    else if (staffAction == 1) {
-                        showAllStaff();
-                    }
-
-
-                }
-
-            }
-            //Author or Editor is logged in, do the following:
-            else if (action == 2222) {
-                //Author/Editor logged in
-                //While the Author/Editor doesn't want to log out do the following
-                while (staffAction != 8) {
-                    staffAction = menu.menuAuthors();
-                    //if action is 0 show all the books
-                    if (staffAction == 0) {
-                        showAllBooks();
-                    }
-                    //if action is 1 show all the books by a given author
-                    else if (staffAction == 1) {
-                        findBooksByAuthor();
-                    }
-
-                }
-            } else if (action == 3333) {
-                //Distributor logged in
-                //While the Distributor doesn't want to log out do the following
-                while (staffAction != 8) {
-                    staffAction = AplusSystemMenu.menuDistributor();
-                    //if action is 0 show all the books
-                    if (staffAction == 0) {
-                        showAllBooks();
-                    }
-
-                }
-            } else if (action == 4444) {
-                // Billing staff logged in
-                //While the Billing Staff doesn't want to log out do the following
-                while (staffAction != 8) {
-                    staffAction = AplusSystemMenu.menuBilling();
-                    //if action is 0 generate the billing for the customers
-                    if (staffAction == 0) {
-                        generateBillingDistributors();
-                    }
-
-                }
-            }
-            //if action is not 9 then let the user know they have not entered an acceptable ID
-            else if (action != 9) {
-                System.out.println("You have entered incorrect ID please try again \n");
-
-            } else if (action == -1) {
-                System.out.println("You have entered incorrect ID please try again \n");
-            }
-
-            staffAction = -1;
-
-        } // end of while (action != 9)
-
-    }
 
     /**
      * Distribution
@@ -1324,7 +1128,7 @@ public class WolfPub {
     public void getTotalRevenue() {
         final String query = "WITH Prices AS (" +
                 "SELECT did, ROUND(price * copies + shcost, 2) AS Price " +
-                "FROM Orders) " +
+                "FROM Orders NATURAL JOIN MakeOrder NATURAL JOIN Distributors) " +
                 "SELECT ROUND(SUM(price), 2) AS Revenue  " +
                 "FROM Prices;";
 
@@ -1332,15 +1136,12 @@ public class WolfPub {
     }
 
     public void getTotalExpenses() {
-        final String query = "WITH Costs AS (" +
-                "SELECT shcost AS cost " +
-                "FROM Orders) UNION ALL (" +
-                "SELECT pay AS cost " +
-                "FROM Staff " +
-                "WHERE periodicity = -1) UNION ALL (" +
-                "SELECT pay * (DATEDIFF(NOW(), sdate) / periodicity) AS cost " +
-                "FROM Staff " +
-                "WHERE periodicity <> -1)) " +
+        final String query = "WITH Costs AS ((\n" +
+                "    SELECT shcost AS cost \n" +
+                "    FROM Orders) UNION ALL (\n" +
+                "    SELECT SUM(paycheck) AS cost\n" +
+                "    FROM Payments    \n" +
+                ")) \n" +
                 "SELECT ROUND(SUM(cost), 2) AS TotalCost FROM Costs;";
 
         runStatement(false, query);
@@ -1383,14 +1184,10 @@ public class WolfPub {
     }
 
     public void getTotalPayByStaffType() {
-        final String query = "WITH Costs AS (" +
-                "SELECT stype, pay AS cost " +
-                "FROM Staff " +
-                "WHERE periodicity = -1) UNION ALL (" +
-                "SELECT stype, pay * (DATEDIFF(NOW(), sdate) / periodicity) AS cost " +
-                "FROM Staff " +
-                "WHERE periodicity <> -1)) " +
-                "SELECT stype, ROUND(SUM(cost), 2) AS pay FROM Costs GROUP BY stype;";
+        final String query = "SELECT stype, SUM(paycheck)\n" +
+                "FROM Staff\n" +
+                "NATURAL JOIN Payments\n" +
+                "GROUP BY stype;\n";
 
         runStatement(false, query);
     }
