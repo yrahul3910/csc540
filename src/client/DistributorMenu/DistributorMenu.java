@@ -10,8 +10,94 @@ public class DistributorMenu {
     public static void main(String[] args) {
         //newDistributor();
         //deleteDistributor();
-        viewAllDistributors();
+        //viewAllDistributors();
         //updateDistributor();
+        //billingDistributor();
+        //newOrderDistributor();
+
+
+    }
+
+    private static void newOrderDistributor() {
+        // have to figure out the query for this.
+/*
+try{
+    String did,book_title,edition,copies,shipping_cost,date;
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    System.out.println("Enter distributor id ( did ) ");
+    did = br.readLine();
+    System.out.println("Enter the book title ");
+    book_title = br.readLine();
+    System.out.println("Enter the edition for the book ");
+    edition = br.readLine();
+    System.out.println("Enter the number of copies ");
+    copies = br.readLine();
+    System.out.println("Enter the shipping cost ");
+    shipping_cost = br.readLine();
+    System.out.println("Enter the date in (YYYY-MM-DD) format ");
+    date = br.readLine();
+
+    Class.forName("com.mysql.cj.jdbc.Driver");
+    Connection connection = null;
+    ResultSet result = null;
+    connection = DriverManager.getConnection(jdbcURL, user, password);
+    connection.setAutoCommit(false); //set autocommit to false
+
+    String sql_to_execute = "INSERT into ORDERS(price,copies,shcost,odate,) values";
+    PreparedStatement statement = connection.prepareStatement(sql_to_execute);
+    statement.execute();
+
+    String sql_to_execute2="";
+    connection.commit(); //commit the transaction if there is no error
+    statement.close();
+    connection.close();
+    System.out.println("\nThe distributor balance has been updated");
+
+
+
+
+
+}
+catch (Exception e)
+{
+
+}
+*/
+    }
+
+    private static void billingDistributor() {
+        // changing the total_balance
+        try {
+            String balance_to_be_added, did;
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Enter distributor id ( did ) ");
+            did = br.readLine();
+            System.out.println("Enter balance to be added");
+            balance_to_be_added = br.readLine();
+
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = null;
+            ResultSet result = null;
+            connection = DriverManager.getConnection(jdbcURL, user, password);
+            connection.setAutoCommit(false); //set autocommit to false
+
+            String sql_to_execute = "update DISTRIBUTORS set tot_balance=tot_balance + ? where did=?";
+            PreparedStatement statement = connection.prepareStatement(sql_to_execute);
+            statement.setString(1, balance_to_be_added);
+            statement.setString(2, did);
+
+            statement.execute();
+            connection.commit(); //commit the transaction if there is no error
+            statement.close();
+            connection.close();
+            System.out.println("\nThe distributor balance has been updated");
+
+
+        } catch (Exception E) {
+            System.out.println("\n ERROR : plese refer tot eh stack trace below for more information");
+            E.printStackTrace();
+        }
+
 
     }
 
@@ -61,6 +147,7 @@ public class DistributorMenu {
             System.out.println("\nThe distributor has been updated");
 
         } catch (Exception E) {
+            System.out.println("\n ERROR : plese refer tot eh stack trace below for more information");
             E.printStackTrace();
         }
     }
@@ -107,6 +194,7 @@ public class DistributorMenu {
             connection.close();
             System.out.println("\nThe distributor has been added");
         } catch (Exception E) {
+            System.out.println("\n ERROR : plese refer tot eh stack trace below for more information");
             E.printStackTrace();
         }
     }
@@ -133,6 +221,7 @@ public class DistributorMenu {
             connection.close();
             System.out.println("\nThe distributor has been removed");
         } catch (Exception E) {
+            System.out.println("\n ERROR : plese refer tot eh stack trace below for more information");
             E.printStackTrace();
         }
     }
@@ -160,6 +249,7 @@ public class DistributorMenu {
             }
 
         } catch (Exception E) {
+            System.out.println("\n ERROR : plese refer tot eh stack trace below for more information");
             E.printStackTrace();
         }
 
