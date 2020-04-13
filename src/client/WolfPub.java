@@ -686,7 +686,7 @@ public class WolfPub {
      * Update date of Issue of Periodic Publication
      * This function includes TRANSACTION
      */
-    public  void updateIssue() {
+    public void updateIssue() {
         String pid, doi1, doi2;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
