@@ -14,14 +14,14 @@ public class PrintCursor {
             ResultSetMetaData meta = this.results.getMetaData();
             int colCount = meta.getColumnCount();
 
-            for (int i = 0; i < colCount; i++) {
+            for (int i = 1; i <= colCount; i++) {
                 String column = meta.getColumnLabel(i);
                 System.out.print(column + "\t");
             }
             System.out.println();
 
             while (this.results.next()) {
-                for (int i = 0; i < colCount; i++)
+                for (int i = 1; i <= colCount; i++)
                     System.out.println(this.results.getString(meta.getColumnLabel(i)) + "\t");
 
                 System.out.println();

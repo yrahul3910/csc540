@@ -20,8 +20,8 @@ abstract class Menu {
 class MainMenu extends Menu {
     @Override
     public int display() {
-        System.out.print("Main Menu:\n1. Editing and publishing\n2. Production of publications\n3.Distribution\n" +
-                "4.Reports\nEnter an option: ");
+        System.out.print("Main Menu:\n1. Editing and publishing\n2. Production of publications\n3. Distribution\n" +
+                "4. Reports\nEnter an option: ");
 
         int ret = new Scanner(System.in).nextInt();
         checkBadThingsHappen(ret, 4);
