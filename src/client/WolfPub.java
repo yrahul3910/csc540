@@ -943,7 +943,7 @@ public class WolfPub {
         }
 
     }
-    
+
     /**
      * Adding new author to the book chapter
      */
@@ -1211,89 +1211,7 @@ public class WolfPub {
 
     }
 
-
-    public void mainsd(String[] args) {
-        int action = -1;
-        int staffAction = -1;
-        //Initializes the entire database. Creates the appropriate tables, sequences, inserts, etc...
-        initialize();
-
-        //While the staff action isn't to quit the program do the following:
-        while (action != 9) {
-            action = WolfPubMenu.loginMenu();
-
-            System.out.println("The choice is " + action);
-            //if the manager is logged in, do the following:
-            if (action == 1111) {
-                //Manager logged in
-                //While the Manager doesn't want to log out do the following
-                while (staffAction != 8) {
-                    staffAction = WolfPubMenu.menuManager();
-                    //if action is 0 show all the books present
-                    if (staffAction == 0) {
-                        showAllBooks();
-                    }
-                    //if action is 8 show all the staff
-                    else if (staffAction == 1) {
-                        showAllStaff();
-                    }
-
-
-                }
-
-            }
-            //Author or Editor is logged in, do the following:
-            else if (action == 2222) {
-                //Author/Editor logged in
-                //While the Author/Editor doesn't want to log out do the following
-                while (staffAction != 8) {
-                    staffAction = menu.menuAuthors();
-                    //if action is 0 show all the books
-                    if (staffAction == 0) {
-                        showAllBooks();
-                    }
-                    //if action is 1 show all the books by a given author
-                    else if (staffAction == 1) {
-                        findBooksByAuthor();
-                    }
-
-                }
-            } else if (action == 3333) {
-                //Distributor logged in
-                //While the Distributor doesn't want to log out do the following
-                while (staffAction != 8) {
-                    staffAction = AplusSystemMenu.menuDistributor();
-                    //if action is 0 show all the books
-                    if (staffAction == 0) {
-                        showAllBooks();
-                    }
-
-                }
-            } else if (action == 4444) {
-                // Billing staff logged in
-                //While the Billing Staff doesn't want to log out do the following
-                while (staffAction != 8) {
-                    staffAction = AplusSystemMenu.menuBilling();
-                    //if action is 0 generate the billing for the customers
-                    if (staffAction == 0) {
-                        generateBillingDistributors();
-                    }
-
-                }
-            }
-            //if action is not 9 then let the user know they have not entered an acceptable ID
-            else if (action != 9) {
-                System.out.println("You have entered incorrect ID please try again \n");
-
-            } else if (action == -1) {
-                System.out.println("You have entered incorrect ID please try again \n");
-            }
-
-            staffAction = -1;
-
-        } // end of while (action != 9)
-
-    }
+    
 
     /**
      * Distribution
