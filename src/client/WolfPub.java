@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.*;
+import java.util.Scanner;
 
 
 public class WolfPub {
@@ -99,8 +100,36 @@ public class WolfPub {
     //************************* EDITING AND PUBLISHING *****************************************
 
     /**
+     * Add topic to a publication
+     */
+    public void addTopic() {
+        System.out.print("Enter the publication ID: ");
+        Scanner scanner = new Scanner(System.in);
+        String pid = scanner.nextLine();
+
+        System.out.print("Enter the topic: ");
+        String topic = scanner.nextLine();
+
+        try {
+            Statement stmt = this.con.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT topic FROM Topics WHERE topic = \"" + topic + "\";");
+            if (!rs.next()) {
+                PreparedStatement ps = this.con.prepareStatement("INSERT INTO Topics VALUES (?)");
+                ps.setString(1, topic);
+
+                ps.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            System.out.print(ex.getMessage());
+        }
+
+        final String query = "INSERT INTO HasTopic VALUES (?, ?);";
+        runPreparedStatement(true, query, pid, topic);
+    }
+
+    /**
      * Entering new publication (book, magazine or journal)
-     * This function inlcudes  TRANSACTIONS
+     * This function includes  TRANSACTIONS
      */
     public void enterPublicationInfo(){
 
@@ -129,7 +158,6 @@ public class WolfPub {
                 dop = br.readLine();
                 System.out.println("Please enter URL: ");
                 url = br.readLine();
-
 
                 this.con.setAutoCommit(false); //set autocommit false
 
