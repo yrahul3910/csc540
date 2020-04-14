@@ -1288,8 +1288,6 @@ public class WolfPub {
             runPreparedStatement(true,sql_to_execute3,pid);
             this.con.commit();
 
-            System.out.println("\nThe distributor order has been updated");
-
         } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());
         }
@@ -1325,8 +1323,6 @@ public class WolfPub {
             String sql_to_execute3="insert into consistof(oid,pid) values ((select max(oid) from orders),?);";
             runPreparedStatement(true,sql_to_execute3,pid);
             this.con.commit();
-
-            System.out.println("\nThe distributor order has been updated");
 
         } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());
@@ -1453,7 +1449,7 @@ public class WolfPub {
         final String query = "WITH Prices AS (" +
                 "SELECT ROUND(price * copies + shcost, 2) AS price, address " +
                 "FROM MakeOrder NATURAL JOIN Orders NATURAL JOIN Distributors) " +
-                "SELECT address, SUM(price) AS cost " +
+                "SELECT address, SUM(price) AS revenue " +
                 "FROM Prices GROUP BY address;";
 
         runStatement(false, query);
