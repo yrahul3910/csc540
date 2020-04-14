@@ -139,7 +139,7 @@ public class WolfPub {
 
 
                 String bookIns = "INSERT INTO BOOKS (pid, ISBN, edition, dop)"
-                        + "VALUES((SELECT pid FROM Publications WHERE title = ? AND ptype = ? ), ?, ?, ?)";
+                        + "VALUES((SELECT MAX(pid) FROM Publications), ?, ?, ?)";
 
                 runPreparedStatement(true, bookIns, ISBN, edition, dop);
                 
@@ -169,15 +169,10 @@ public class WolfPub {
                 runPreparedStatement(true, pubInse, title, "magazine", editor, url);
 
 
-                String magIns = "INSERT INTO periodicpublication( pid, periodicity, pptype, pptext) "
-                        + "VALUES((SELECT pid FROM Publications WHERE title = ? AND ptype = ? ),?,?,?)";
-                PreparedStatement preparedStat = this.con.prepareStatement(magIns);
-                preparedStat.setString(1, title);
-                preparedStat.setString(2, "magazine");
-                preparedStat.setString(3, periodicity);
-                preparedStat.setString(4, "magazine");
-                preparedStat.setString(5, pptext);
-                preparedStat.executeUpdate();
+                String magIns = "INSERT INTO periodicpublication( pid, periodicity, pptext) "
+                        + "VALUES((SELECT MAX(pid) FROM Publications),?,?)";
+                runPreparedStatement(true, magIns, periodicity, pptext);
+
 
                 this.con.commit(); //commits the transaction to the database if no error has been detected
                 System.out.println( "\nTransaction Success!!" );
@@ -201,15 +196,9 @@ public class WolfPub {
                         + "VALUES(?,?,?,?)";
                 runPreparedStatement(true, pubInse, title, "magazine", editor, url);
 
-                String jourIns = "INSERT INTO periodicpublication( pid, periodicity, pptype, pptext) "
-                        + "VALUES((SELECT pid FROM Publications WHERE title = ? AND ptype = ? ),?,?,?)";
-                PreparedStatement preparedStat = this.con.prepareStatement(jourIns);
-                preparedStat.setString(1, title);
-                preparedStat.setString(2, "journal");
-                preparedStat.setString(3, periodicity);
-                preparedStat.setString(4, "journal");
-                preparedStat.setString(5, pptext);
-                preparedStat.executeUpdate();
+                String jourIns = "INSERT INTO periodicpublication( pid, periodicity, pptext) "
+                        + "VALUES((SELECT MAX(pid) FROM Publications),?,?)";
+                runPreparedStatement(true, jourIns, periodicity, pptext);
 
                 this.con.commit(); //commits the transaction to the database if no error has been detected
                 System.out.println( "\nTransaction Success!!" );
