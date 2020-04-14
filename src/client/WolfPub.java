@@ -1279,7 +1279,7 @@ public class WolfPub {
 
             String sql_to_execute = "select copies*price+shcost from orders where oid = ?";
             runPreparedStatement(false, sql_to_execute,oid);
-            this.con.commit();
+            
 
         } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());
