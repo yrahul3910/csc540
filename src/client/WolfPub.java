@@ -38,6 +38,14 @@ public class WolfPub {
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
+
+            try {
+                if (!this.con.getAutoCommit())
+                    this.con.rollback();
+            } catch (SQLException e) {
+                System.out.println("All hope has evaded us. We could not even successfully rollback :(");
+                System.out.println(e.getMessage());
+            }
         }
     }
 
