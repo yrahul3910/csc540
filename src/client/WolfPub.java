@@ -38,6 +38,14 @@ public class WolfPub {
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
+
+            try {
+                if (!this.con.getAutoCommit())
+                    this.con.rollback();
+            } catch (SQLException e) {
+                System.out.println("All hope has evaded us. We could not even successfully rollback :(");
+                System.out.println(e.getMessage());
+            }
         }
     }
 
@@ -304,6 +312,29 @@ public class WolfPub {
             }
         }
 
+        catch (Exception e) {
+            System.out.println("There is an error: " + e.getMessage());
+        }
+    }
+    /**
+     * Delete publication
+     * This function has TRANSACTIONS
+     */
+
+    public void deletePublication() {
+        String pid;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Please enter publication ID of the book:");
+            pid = br.readLine();
+
+            this.con.setAutoCommit(false); //set autocommit false
+
+            String prepareds = "DELETE FROM publications WHERE pid = ? ";
+            runPreparedStatement(true, prepareds, pid);
+
+            this.con.commit(); //commits the transaction to the database if no error has been detected
+        }
         catch (Exception e) {
             System.out.println("There is an error: " + e.getMessage());
         }
@@ -1103,11 +1134,117 @@ public class WolfPub {
      * Distribution
      */
 
+    public void viewAllDistributor()
+    {
+        final String query = "SELECT * from Distributors";
+        runStatement(false,query);
+    }
+
+    public void deleteDistributor() {
+        try {
+            String did;
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Enter distributor id ( did ) ");
+            did = br.readLine();
+            this.con.setAutoCommit(false);
+            String query = "delete from distributors where did=?";
+            runPreparedStatement(true, query, did);
+            this.con.commit();
+            System.out.println("\nDistributor deleted!");
+        }
+        catch (Exception e)
+        {
+            System.out.println("There was an error: " + e.getMessage());
+        }
+    }
+
+    public void newDistributor() {
+        try {
+            String dname, dtype, address, city, phno, contact, tot_balance;
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Enter distributor name");
+            dname = br.readLine();
+            System.out.println("Enter distributor type");
+            dtype = br.readLine();
+            System.out.println("Enter distributor address");
+            address = br.readLine();
+            System.out.println("Enter distributor city");
+            city = br.readLine();
+            System.out.println("Enter distributor phone number");
+            phno = br.readLine();
+            System.out.println("Enter distributor contact");
+            contact = br.readLine();
+            System.out.println("Enter distributor tot_balance");
+            tot_balance = br.readLine();
+            String sql_to_execute = "insert into distributors(dname,dtype,address,city,phno,contact,tot_balance) values (?,?,?,?,?,?,?)";
+            runPreparedStatement(true,sql_to_execute,dname,dtype,address,city,phno,contact,tot_balance);
+            System.out.println("Disttributor has been added");
 
 
-    /**
-     * Report generation
-     */
+        } catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
+        }
+    }
+
+    public void updateDistributor() {
+        try {
+            String did, dname, dtype, address, city, phno, contact, tot_balance;
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Enter distributor id ( did ) ");
+            did = br.readLine();
+            System.out.println("Enter modified distributor name");
+            dname = br.readLine();
+            System.out.println("Enter modified distributor type");
+            dtype = br.readLine();
+            System.out.println("Enter modified distributor address");
+            address = br.readLine();
+            System.out.println("Enter modified distributor city");
+            city = br.readLine();
+            System.out.println("Enter modified distributor phone number");
+            phno = br.readLine();
+            System.out.println("Enter modified distributor contact");
+            contact = br.readLine();
+            System.out.println("Enter modified distributor tot_balance");
+            tot_balance = br.readLine();
+
+
+
+            String sql_to_execute = "update DISTRIBUTORS set dname=?, dtype=?, address=?, city=?, phno=?, contact=?,tot_balance=? where did=?";
+            runPreparedStatement(true,sql_to_execute,dname,dtype,address,city,phno,contact,tot_balance,did);
+            System.out.println("\nThe distributor has been updated");
+
+        } catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
+        }
+    }
+
+    public void billingDistributor() {
+        // changing the total_balance
+        try {
+            String balance_to_be_added, did;
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Enter distributor id ( did ) ");
+            did = br.readLine();
+            System.out.println("Enter balance to be added ( enter negative values in case of balance deduction)");
+            balance_to_be_added = br.readLine();
+
+
+            String sql_to_execute = "update DISTRIBUTORS set tot_balance=tot_balance + ? where did=?";
+            runPreparedStatement(true, sql_to_execute, balance_to_be_added, did);
+            System.out.println("\nThe distributor balance has been updated");
+
+
+        } catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
+        }
+
+    }
+
+
+
+        /**
+         * Report generation
+         */
 
     /**
      * Returns the number of copies sold by each distributor.

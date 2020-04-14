@@ -20,8 +20,8 @@ abstract class Menu {
 class MainMenu extends Menu {
     @Override
     public int display() {
-        System.out.print("Main Menu:\n1. Editing and publishing\n2. Production of publications\n3.Distribution\n" +
-                "4.Reports\nEnter an option: ");
+        System.out.print("Main Menu:\n1. Editing and publishing\n2. Production of publications\n3. Distribution\n" +
+                "4. Reports\nEnter an option: ");
 
         int ret = new Scanner(System.in).nextInt();
         checkBadThingsHappen(ret, 4);
@@ -167,13 +167,13 @@ class DistributionMenu extends Menu {
 
         switch (option) {
             case 1:
-                // TODO
+                runner.newDistributor();
                 break;
             case 2:
-                // TODO
+                runner.updateDistributor();
                 break;
             case 3:
-                // TODO
+                runner.deleteDistributor();
                 break;
             case 4:
                 // TODO
@@ -182,7 +182,7 @@ class DistributionMenu extends Menu {
                 // TODO
                 break;
             case 6:
-                // TODO
+                runner.billingDistributor();
                 break;
             case 7:
                 // TODO
@@ -249,6 +249,13 @@ public class WolfPubMenu {
         submenus[3] = new ReportsMenu();
 
         MainMenu menu = new MainMenu();
-        submenus[menu.display() - 1].display();
+
+        while (true) {
+            submenus[menu.display() - 1].display();
+            System.out.print("\n\nContinue? (y/n): ");
+            String inp = new Scanner(System.in).nextLine();
+
+            if (inp.equals("n") || inp.equals("N")) break;
+        }
     }
 }

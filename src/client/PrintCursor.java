@@ -2,6 +2,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import static java.lang.Math.min;
+
 public class PrintCursor {
     private ResultSet results;
 
@@ -13,16 +15,22 @@ public class PrintCursor {
         try {
             ResultSetMetaData meta = this.results.getMetaData();
             int colCount = meta.getColumnCount();
+            int displaySize = 0;
 
-            for (int i = 0; i < colCount; i++) {
+            for (int i = 1; i <= colCount; i++) {
                 String column = meta.getColumnLabel(i);
-                System.out.print(column + "\t");
+                displaySize = min(meta.getColumnDisplaySize(i), 20);
+                String format = "%" + String.valueOf(displaySize) + "s";
+                System.out.printf(format, column);
             }
             System.out.println();
 
             while (this.results.next()) {
-                for (int i = 0; i < colCount; i++)
-                    System.out.println(this.results.getString(meta.getColumnLabel(i)) + "\t");
+                for (int i = 1; i <= colCount; i++) {
+                    displaySize = min(meta.getColumnDisplaySize(i), 20);
+                    String format = "%" + String.valueOf(displaySize) + "s";
+                    System.out.printf(format, this.results.getString(meta.getColumnLabel(i)) + "\t\t");
+                }
 
                 System.out.println();
             }
