@@ -1268,6 +1268,45 @@ public class WolfPub {
 
     }
 
+    public void newIssueOrderDistributor() {
+        // changing the total_balance
+        try {
+            String did,issue_title,date_of_issue,copies,shipping_cost,odate,del_date,price;
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Enter distributor id ( did ) ");
+            did = br.readLine();
+            System.out.println("Enter the issue_title ");
+            issue_title = br.readLine();
+            System.out.println("Enter the date of issue (YYYY-MM-DD format) ");
+            date_of_issue = br.readLine();
+            System.out.println("Enter the number of copies ");
+            copies = br.readLine();
+            System.out.println("Enter the price per copy ");
+            price = br.readLine();
+            System.out.println("Enter the shipping cost ");
+            shipping_cost = br.readLine();
+            System.out.println("Enter the date in (YYYY-MM-DD) format ");
+            odate = br.readLine();
+            System.out.println("Enter the delivery date in (YYYY-MM-DD) format ");
+            del_date = br.readLine();
+
+            this.con.setAutoCommit(false);
+            String sql_to_execute = "INSERT into ORDERS(copies,odate,deldate,price,shcost) values (?,?,?,?,?)";
+            runPreparedStatement(true, sql_to_execute,copies,odate,del_date,price,shipping_cost);
+            String sql_to_execute2 = "insert into makeorder(oid,did) values ((select max(oid) from orders),?);";
+            runPreparedStatement(true,sql_to_execute2,did);
+            String sql_to_execute3="insert into consistof(oid,pid) values ((select max(oid) from orders),(select pid from issue natural join publications where title = ? and edition=?));";
+            runPreparedStatement(true,sql_to_execute3,issue_title,date_of_issue);
+            this.con.commit();
+
+            System.out.println("\nThe distributor order has been updated");
+
+        } catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
+        }
+
+    }
+
     public void billingDistributor() {
         // takes OID to bill ditributor
         try {
@@ -1279,7 +1318,7 @@ public class WolfPub {
 
             String sql_to_execute = "select copies*price+shcost from orders where oid = ?";
             runPreparedStatement(false, sql_to_execute,oid);
-            
+
 
         } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());

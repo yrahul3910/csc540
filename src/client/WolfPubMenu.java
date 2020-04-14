@@ -179,7 +179,7 @@ class DistributionMenu extends Menu {
                 runner.newBookOrderDistributor();
                 break;
             case 5:
-                // TODO
+                runner.newIssueOrderDistributor();
                 break;
             case 6:
                 runner.billingDistributor();
