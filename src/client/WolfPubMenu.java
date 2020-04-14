@@ -104,8 +104,7 @@ class ProductionMenu extends Menu {
                 runner.updateIssue();
                 break;
             case 5:
-                // TODO
-
+                runner.deletePublication();
                 break;
             case 6:
                 runner.deleteIssue();
@@ -162,7 +161,7 @@ class DistributionMenu extends Menu {
     @Override
     public int display() {
         System.out.print("1. Enter new distributor\n2. Update distributor information\n3. Delete distributor\n" +
-                "4. Input orders from distributors for book\n5. Input orders for issue\n6. Bill distributor\n" +
+                "4. Input orders from distributors for book\n5. Input orders from distributors for issue\n6. Bill distributor\n" +
                 "7. Change outstanding balance on payment\nEnter an option: ");
 
         int option = new Scanner(System.in).nextInt();
@@ -188,7 +187,7 @@ class DistributionMenu extends Menu {
                 runner.billingDistributor();
                 break;
             case 7:
-                runner.changeBalanceDistributor()
+                runner.changeBalanceDistributor();
                 break;
         }
 

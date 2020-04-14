@@ -1364,7 +1364,7 @@ public class WolfPub {
      * Returns the number of copies sold by each distributor.
      */
     public void getCopiesSoldByDistributor() {
-        final String query = "SELECT did, dname, MONTHNAME(odate), YEAR(odate) " +
+        final String query = "SELECT did, dname, MONTHNAME(odate), YEAR(odate), COUNT(*)  " +
                 "FROM Distributors NATURAL JOIN MakeOrder NATURAL JOIN Orders " +
                 "GROUP BY did, MONTHNAME(odate), YEAR(odate);";
 
