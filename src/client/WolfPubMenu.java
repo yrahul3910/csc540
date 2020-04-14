@@ -36,10 +36,10 @@ class EditingMenu extends Menu {
         System.out.print("1. Enter basic information on a new publication\n2. Update publication information\n" +
                 "3. Assign editor to publication\n4. View information on publications for an editor\n" +
                 "5. Add an article\n 6. Delete an article\n7. Add chapter to book\n8. Delete chapter from book\n" +
-                "Enter an option: ");
+                "9. Add topic to publication\nEnter an option: ");
 
         int option = new Scanner(System.in).nextInt();
-        checkBadThingsHappen(option, 8);
+        checkBadThingsHappen(option, 9);
 
         switch (option) {
             case 1:
@@ -65,6 +65,9 @@ class EditingMenu extends Menu {
                 break;
             case 8:
                 runner.deleteChapter();
+                break;
+            case 9:
+                runner.addTopic();
                 break;
         }
 
