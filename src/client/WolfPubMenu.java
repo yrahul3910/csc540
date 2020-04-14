@@ -176,7 +176,7 @@ class DistributionMenu extends Menu {
                 runner.deleteDistributor();
                 break;
             case 4:
-                // TODO
+                runner.newBookOrderDistributor();
                 break;
             case 5:
                 // TODO
@@ -185,7 +185,7 @@ class DistributionMenu extends Menu {
                 runner.billingDistributor();
                 break;
             case 7:
-                // TODO
+                runner.changeBalanceDistributor()
                 break;
         }
 

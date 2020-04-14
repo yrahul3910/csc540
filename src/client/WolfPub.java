@@ -1207,7 +1207,7 @@ public class WolfPub {
         }
     }
 
-    public void billingDistributor() {
+    public void changeBalanceDistributor() {
         // changing the total_balance
         try {
             String balance_to_be_added, did;
@@ -1222,6 +1222,64 @@ public class WolfPub {
             runPreparedStatement(true, sql_to_execute, balance_to_be_added, did);
             System.out.println("\nThe distributor balance has been updated");
 
+
+        } catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
+        }
+
+    }
+
+    public void newBookOrderDistributor() {
+        // changing the total_balance
+        try {
+            String did,book_title,edition,copies,shipping_cost,odate,del_date,price;
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            System.out.println("Enter distributor id ( did ) ");
+            did = br.readLine();
+            System.out.println("Enter the book title ");
+            book_title = br.readLine();
+            System.out.println("Enter the edition for the book ");
+            edition = br.readLine();
+            System.out.println("Enter the number of copies ");
+            copies = br.readLine();
+            System.out.println("Enter the price per copy ");
+            price = br.readLine();
+            System.out.println("Enter the shipping cost ");
+            shipping_cost = br.readLine();
+            System.out.println("Enter the date in (YYYY-MM-DD) format ");
+            odate = br.readLine();
+            System.out.println("Enter the delivery date in (YYYY-MM-DD) format ");
+            del_date = br.readLine();
+
+            this.con.setAutoCommit(false);
+            String sql_to_execute = "INSERT into ORDERS(copies,odate,deldate,price,shcost) values (?,?,?,?,?)";
+            runPreparedStatement(true, sql_to_execute,copies,odate,del_date,price,shipping_cost);
+            String sql_to_execute2 = "insert into makeorder(oid,did) values ((select max(oid) from orders),?);";
+            runPreparedStatement(true,sql_to_execute2,did);
+            String sql_to_execute3="insert into consistof(oid,pid) values ((select max(oid) from orders),(select pid from books natural join publications where title = ? and edition=?));";
+            runPreparedStatement(true,sql_to_execute3,book_title,edition);
+            this.con.commit();
+
+            System.out.println("\nThe distributor order has been updated");
+
+        } catch (Exception e) {
+            System.out.println("There was an error: " + e.getMessage());
+        }
+
+    }
+
+    public void billingDistributor() {
+        // takes OID to bill ditributor
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            String oid;
+            System.out.println("Enter the order ID ");
+            oid = br.readLine();
+
+
+            String sql_to_execute = "select copies*price+shcost from orders where oid = ?";
+            runPreparedStatement(false, sql_to_execute,oid);
+            this.con.commit();
 
         } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());
