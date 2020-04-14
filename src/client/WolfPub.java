@@ -1260,12 +1260,12 @@ public class WolfPub {
     public void newBookOrderDistributor() {
         // changing the total_balance
         try {
-            String did,book_title,edition,copies,shipping_cost,odate,del_date,price;
+            String did,pid,edition,copies,shipping_cost,odate,del_date,price;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Enter distributor id ( did ) ");
             did = br.readLine();
-            System.out.println("Enter the book title ");
-            book_title = br.readLine();
+            System.out.println("Enter the publication ID: ");
+            pid = br.readLine();
             System.out.println("Enter the edition for the book ");
             edition = br.readLine();
             System.out.println("Enter the number of copies ");
@@ -1284,8 +1284,8 @@ public class WolfPub {
             runPreparedStatement(true, sql_to_execute,copies,odate,del_date,price,shipping_cost);
             String sql_to_execute2 = "insert into makeorder(oid,did) values ((select max(oid) from orders),?);";
             runPreparedStatement(true,sql_to_execute2,did);
-            String sql_to_execute3="insert into consistof(oid,pid) values ((select max(oid) from orders),(select pid from books natural join publications where title = ? and edition=?));";
-            runPreparedStatement(true,sql_to_execute3,book_title,edition);
+            String sql_to_execute3="insert into consistof(oid,pid) values ((select max(oid) from orders),?);";
+            runPreparedStatement(true,sql_to_execute3,pid);
             this.con.commit();
 
             System.out.println("\nThe distributor order has been updated");
@@ -1299,14 +1299,13 @@ public class WolfPub {
     public void newIssueOrderDistributor() {
         // changing the total_balance
         try {
-            String did,issue_title,date_of_issue,copies,shipping_cost,odate,del_date,price;
+            String did, pid, date_of_issue,copies,shipping_cost,odate,del_date,price;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Enter distributor id ( did ) ");
             did = br.readLine();
-            System.out.println("Enter the issue_title ");
-            issue_title = br.readLine();
-            System.out.println("Enter the date of issue (YYYY-MM-DD format) ");
-            date_of_issue = br.readLine();
+            System.out.println("Enter the publication ID ");
+            pid = br.readLine();
+
             System.out.println("Enter the number of copies ");
             copies = br.readLine();
             System.out.println("Enter the price per copy ");
@@ -1323,8 +1322,8 @@ public class WolfPub {
             runPreparedStatement(true, sql_to_execute,copies,odate,del_date,price,shipping_cost);
             String sql_to_execute2 = "insert into makeorder(oid,did) values ((select max(oid) from orders),?);";
             runPreparedStatement(true,sql_to_execute2,did);
-            String sql_to_execute3="insert into consistof(oid,pid) values ((select max(oid) from orders),(select pid from issue natural join publications where title = ? and edition=?));";
-            runPreparedStatement(true,sql_to_execute3,issue_title,date_of_issue);
+            String sql_to_execute3="insert into consistof(oid,pid) values ((select max(oid) from orders),?);";
+            runPreparedStatement(true,sql_to_execute3,pid);
             this.con.commit();
 
             System.out.println("\nThe distributor order has been updated");
