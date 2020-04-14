@@ -313,7 +313,7 @@ public class WolfPub {
      * This function has TRANSACTIONS
      */
 
-    public static void deletePublication() {
+    public void deletePublication() {
         String pid;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -1139,12 +1139,12 @@ public class WolfPub {
             System.out.println("Enter distributor id ( did ) ");
             did = br.readLine();
             this.con.setAutoCommit(false);
-            string query = "delete from distributors where did=?";
+            String query = "delete from distributors where did=?";
             runPreparedStatement(true, query, did);
             this.con.commit();
             System.out.println("\nDistributor deleted!");
         }
-        catch (Exception E)
+        catch (Exception e)
         {
             System.out.println("There was an error: " + e.getMessage());
         }
@@ -1173,12 +1173,12 @@ public class WolfPub {
             System.out.println("Disttributor has been added");
 
 
-        } catch (Exception E) {
+        } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());
         }
     }
 
-    private void updateDistributor() {
+    public void updateDistributor() {
         try {
             String did, dname, dtype, address, city, phno, contact, tot_balance;
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -1205,12 +1205,12 @@ public class WolfPub {
             runPreparedStatement(true,sql_to_execute,dname,dtype,address,city,phno,contact,tot_balance,did);
             System.out.println("\nThe distributor has been updated");
 
-        } catch (Exception E) {
+        } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());
         }
     }
 
-    private void billingDistributor() {
+    public void billingDistributor() {
         // changing the total_balance
         try {
             String balance_to_be_added, did;
@@ -1222,15 +1222,15 @@ public class WolfPub {
 
 
             String sql_to_execute = "update DISTRIBUTORS set tot_balance=tot_balance + ? where did=?";
-            runPreparedStatement(true,sql_to_execute,tot_balance,did);
+            runPreparedStatement(true, sql_to_execute, balance_to_be_added, did);
             System.out.println("\nThe distributor balance has been updated");
 
 
-        } catch (Exception E) {
+        } catch (Exception e) {
             System.out.println("There was an error: " + e.getMessage());
         }
 
-
+    }
 
 
 
