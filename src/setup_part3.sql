@@ -45,10 +45,6 @@ INSERT INTO Staff(sname, age, gender, stype, phone, email, address)
 VALUES ("Ethen", 30, "M", "staff editor", 9491234567, "3002@gmail.com", "21 ABC St, NC 27606");
 INSERT INTO Staff(sname, age, gender, stype, phone, email, address)
 VALUES ("Cathy", 28, "F", "invited author", 9591234567, "3003@gmail.com", "3300 AAA St, NC 27606");
-INSERT INTO Staff(sname, age, gender, stype, phone, email, address) 
-VALUES ('Chris', 32, "M", "staff author",  9095866774, "3004@gmail.com", "3311 CDE St, NC 27605");
-INSERT INTO Staff(sname, age, gender, stype, phone, email, address) 
-VALUES ('Ariel', 30, "F", "staff author",  9893869812, "3005@gmail.com", "125 Nory St, NC 27635");
 
 
 CREATE TABLE Payments (
@@ -63,15 +59,11 @@ ON UPDATE CASCADE ON DELETE CASCADE
 INSERT INTO Payments (sid, paycheck, paydate)
 VALUES (3001, 1000, "2020-04-01");
 INSERT INTO Payments (sid, paycheck, paydate)
-VALUES (3003, 1000, "2020-04-01");
+VALUES (3002, 1000, "2020-04-01");
 INSERT INTO Payments (sid, paycheck, paydate)
 VALUES (3003, 1200, "2020-04-01");
-INSERT INTO Payments (sid, paycheck, paydate)
-VALUES (3004, 1100, "2020-04-01");
-INSERT INTO Payments (sid, paycheck, paydate)
-VALUES (3005, 1000, "2020-04-01");
 
--- price deleted from Publications
+
 CREATE TABLE Publications (
 pid INT AUTO_INCREMENT PRIMARY KEY,
 ptype VARCHAR(30) NOT NULL,
@@ -87,10 +79,6 @@ INSERT INTO Publications (ptype, title, editor)
 VALUES ('magazine', 'Healthy Diet', 'Ethen');
 INSERT INTO Publications (ptype, title, editor)
 VALUES ('journal', 'Animal Science', '/');
-INSERT INTO Publications (ptype, title, editor, url)
-VALUES ('book', 'Food for Today', 'John', 'https://bit.ly/2xhTC1e');
-INSERT INTO Publications(ptype, title, editor, url) 
-VALUES ('magazine', 'Birds and Blooms', 'Ethen', 'https://bit.ly/2vIN7o4');
 
 
 CREATE TABLE Books(
@@ -105,7 +93,6 @@ PRIMARY KEY(pid)
 
 
 INSERT INTO Books(pid, ISBN, edition, dop) VALUES (1001, 12345, 2, '2018-10-10');
-INSERT INTO Books(pid, ISBN, edition, dop) VALUES (1004, 346752, 1, '2019-08-02');
 
 
 CREATE TABLE Chapters(
@@ -138,8 +125,7 @@ INSERT INTO PeriodicPublication(pid, periodicity, pptext)
 VALUES (1002, 'monthly', 'ABC');
 INSERT INTO PeriodicPublication(pid, periodicity, pptext) 
 VALUES (1003, 'monthly', 'AAA');
-INSERT INTO PeriodicPublication(pid, periodicity, pptext) 
-VALUES (1005, 'weekly', 'Birds');
+
 
 CREATE TABLE Issue(
 pid INT NOT NULL,
@@ -154,8 +140,6 @@ INSERT INTO Issue (pid, doi)
 VALUES (1002, '2020-02-24');
 INSERT INTO Issue (pid, doi)
 VALUES (1003, '2020-03-01');
-INSERT INTO Issue (pid, doi)
-VALUES (1005, '2020-01-07');
 
 
 CREATE TABLE Articles(
@@ -190,10 +174,6 @@ INSERT INTO Distributors (dname, dtype, address, city, phno, contact, tot_balanc
 VALUES ('BookSell', 'bookstore', '2200, A Street, NC', 'Charlotte', 9191234567, 'Jason', 215);
 INSERT INTO Distributors (dname, dtype, address, city, phno, contact, tot_balance) 
 VALUES ('BookDist', 'wholesaler', '2200, B Street, NC', 'Raleigh', 9291234567, 'Alex', 0);
-INSERT INTO Distributors (dname, dtype, address, city, phno, contact, tot_balance) 
-VALUES ('Robinson', 'library', '1315 Oakwood Ave, NC', 'Raleigh', 9842314572, 'Andrew', 0);
-INSERT INTO Distributors (dname, dtype, address, city, phno, contact, tot_balance) 
-VALUES ('The Book Barn', 'bookstore', '410 Delaware St', 'Leavenworth', 9136826518, 'Charles', 0);
 
 
 CREATE TABLE Orders(
@@ -211,8 +191,6 @@ INSERT INTO Orders (copies, odate, deldate, price, shcost)
 VALUES (10, '2020-02-05', '2020-02-15', 20, 15);
 INSERT INTO Orders (copies, odate, deldate, price, shcost)
 VALUES (10, '2020-02-10', '2020-02-25', 10, 15);
-INSERT INTO Orders (copies, odate, deldate, price, shcost)
-VALUES (40, '2020-02-20', '2020-03-10', 17, 20);
 
 
 CREATE TABLE ConsistOf(
@@ -231,8 +209,7 @@ INSERT INTO ConsistOf(oid, pid)
 VALUES (4002, 1001);
 INSERT INTO ConsistOf(oid, pid)
 VALUES (4003, 1003);
-INSERT INTO ConsistOf(oid, pid)
-VALUES (4004, 1005);
+
 
 CREATE TABLE MakeOrder(
 did INT NOT NULL,
@@ -250,8 +227,6 @@ INSERT INTO MakeOrder(did, oid)
 VALUES (2001, 4002);
 INSERT INTO MakeOrder(did, oid)
 VALUES (2002, 4003);
-INSERT INTO MakeOrder(did, oid)
-VALUES (2003, 4004);
 
 
 CREATE TABLE ContainArticle(
@@ -271,8 +246,6 @@ INSERT INTO ContainArticle(pid, aid, doi)
 VALUES (1002, 5001, '2020-02-24');
 INSERT INTO ContainArticle(pid, aid, doi)
 VALUES (1003, 5003, '2020-03-01');
-INSERT INTO ContainArticle(pid, aid, doi)
-VALUES (1005, 5002, '2020-01-07');
 
 
 CREATE TABLE Edit(
@@ -289,12 +262,6 @@ INSERT INTO Edit (pid, sid)
 VALUES (1001, 3001);
 INSERT INTO Edit (pid, sid)
 VALUES (1002, 3002);
-INSERT INTO Edit (pid, sid)
-VALUES (1004, 3001);
-INSERT INTO Edit (pid, sid)
-VALUES (1005, 3002);
-
--- INSERT INTO Edit (pid, sid) VALUES (1002, 3001);
 
 
 CREATE TABLE WriteArticle(
@@ -307,12 +274,6 @@ ON UPDATE CASCADE ON DELETE CASCADE,
 PRIMARY KEY(aid, sid)
 );
 
-INSERT INTO WriteArticle (aid, sid)
-VALUES (5001, 3004);
-INSERT INTO WriteArticle (aid, sid)
-VALUES (5002, 3003);
-INSERT INTO WriteArticle (aid, sid)
-VALUES (5003, 3004);
 
 CREATE TABLE WriteBook(
 pid INT NOT NULL,
@@ -324,11 +285,6 @@ ON UPDATE CASCADE ON DELETE CASCADE,
 PRIMARY KEY(pid, sid)
 );
 
-INSERT INTO WriteBook (pid, sid)
-VALUES (1001, 3003);
-INSERT INTO WriteBook (pid, sid)
-VALUES (1004, 3005);
-
 
 CREATE TABLE Topics(
 topic VARCHAR(50) PRIMARY KEY
@@ -337,7 +293,6 @@ topic VARCHAR(50) PRIMARY KEY
 INSERT INTO Topics (topic) VALUES ('technology');
 INSERT INTO Topics (topic) VALUES ('health');
 INSERT INTO Topics (topic) VALUES ('science');
-INSERT INTO Topics (topic) VALUES ('nature');
 
 CREATE TABLE HasTopic(
 pid INT NOT NULL,
@@ -355,7 +310,3 @@ INSERT INTO HasTopic(pid, topic)
 VALUES (1002, 'health');
 INSERT INTO HasTopic(pid, topic)
 VALUES (1003, 'science');
-INSERT INTO HasTopic(pid, topic)
-VALUES (1004, 'health');
-INSERT INTO HasTopic(pid, topic)
-VALUES (1005, 'nature');
